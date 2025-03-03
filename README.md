@@ -1,0 +1,1 @@
+# confini-amministrativi-istat_qgis_plugin
