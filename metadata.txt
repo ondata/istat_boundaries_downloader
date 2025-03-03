@@ -1,0 +1,21 @@
+[general]
+name=ISTAT Boundaries Downloader
+description=Download Italian administrative boundaries (ISTAT) from onData API
+version=1.0.0
+qgisMinimumVersion=3.0
+qgisMaximumVersion=3.99
+
+author=Totò Fiandaca
+email=pigrecoinfinito@gmail.com
+
+tags=ondata,confini,istat,regioni,provice,comuni,ripartizioni
+
+about=This plugin allows you to download Italian administrative boundaries from the onData API. It supports various boundary types (regions, provinces, municipalities) at different dates.
+repository=https://github.com/yourusername/istat_boundaries_downloader
+tracker=https://github.com/yourusername/istat_boundaries_downloader/issues
+homepage=https://www.ondata.it/
+
+category=Vector
+icon=icon.png
+experimental=False
+deprecated=False
