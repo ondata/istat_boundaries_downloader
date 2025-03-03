@@ -44,12 +44,6 @@ L'interfaccia del plugin si presenta con le seguenti opzioni:
 
 ### Funzionalità Principali
 
-#### Verifica della Disponibilità
-1. Seleziona le opzioni desiderate (data, tipo di confine, formato)
-2. Clicca sul pulsante "Verifica disponibilità"
-3. Il plugin verificherà se la risorsa richiesta è disponibile sul server
-4. Se la risorsa non è disponibile, ti verrà data l'opzione di visualizzare date alternative
-
 #### Download dei Confini
 1. Seleziona le opzioni desiderate
 2. Clicca sul pulsante "Sfoglia" per scegliere la cartella di destinazione
