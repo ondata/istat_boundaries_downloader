@@ -8,7 +8,7 @@ qgisMaximumVersion=3.99
 author=Totò Fiandaca
 email=pigrecoinfinito@gmail.com
 
-tags=ondata,confini,istat,regioni,provice,comuni,ripartizioni
+tags=api, topojson, json, csv, geojson, gis, openapi, geopackage, shapefile, anpr, istat, italia, ontopia, ondata, geobuf, geoparquet
 
 about=This plugin allows you to download Italian administrative boundaries from the onData API. It supports various boundary types (regions, provinces, municipalities) at different dates.
 repository=https://github.com/yourusername/istat_boundaries_downloader
@@ -19,3 +19,5 @@ category=Vector
 icon=icon.png
 experimental=False
 deprecated=False
+
+
