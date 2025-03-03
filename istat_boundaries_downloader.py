@@ -61,7 +61,8 @@ class IstatBoundariesDownloader:
         # Define available formats
         self.formats = {
             "Shapefile (.zip)": "zip",
-            "GeoPackage (.gpkg)": "gpkg"
+            "GeoPackage (.gpkg)": "gpkg",
+            "CSV (.csv)": "csv"
         }
 
     def initGui(self):
@@ -201,6 +202,15 @@ class DownloaderDialog(QDialog):
         format_layout.addWidget(format_label)
         format_layout.addWidget(self.format_combo)
         layout.addLayout(format_layout)
+        
+        # Aggiungi nota sul formato CSV
+        self.csv_note = QLabel("Nota: il formato CSV non contiene geometrie, solo dati tabellari.")
+        self.csv_note.setStyleSheet("color: #FF5722; font-style: italic;")
+        self.csv_note.setVisible(False)  # Inizialmente nascosto
+        layout.addWidget(self.csv_note)
+        
+        # Mostra/nascondi la nota quando il formato selezionato cambia
+        self.format_combo.currentIndexChanged.connect(self.update_format_notes)
         
         # Prima del layout URL preview, aggiungi il selettore del percorso di salvataggio
         save_path_layout = QHBoxLayout()
@@ -378,6 +388,10 @@ class DownloaderDialog(QDialog):
             file_format = self.formats[self.format_combo.currentText()]
             save_only = self.save_only_check.isChecked()
             
+            # Verifica che la cartella di destinazione esista
+            if not os.path.exists(self.download_path):
+                os.makedirs(self.download_path)
+            
             # Construct the URL
             url = f"{self.base_url}{date_str}/{boundary_type}.{file_format}"
             
@@ -420,6 +434,10 @@ class DownloaderDialog(QDialog):
             
             # Gestione diversa in base al formato
             if file_format == "zip":
+                # Copia nella destinazione specificata dall'utente
+                dest_zip_path = os.path.join(self.download_path, f"{file_name}.zip")
+                shutil.copyfile(temp_file_path, dest_zip_path)
+                
                 # Extract the file if it's a ZIP for processing and viewing in QGIS
                 try:
                     with zipfile.ZipFile(temp_file_path, 'r') as zip_ref:
@@ -436,35 +454,54 @@ class DownloaderDialog(QDialog):
                     # Path per QGIS
                     qgis_file_path = os.path.join(temp_dir, shp_files[0])
                     
-                    # Copia nella destinazione specificata dall'utente
-                    dest_zip_path = os.path.join(self.download_path, f"{file_name}.zip")
-                    shutil.copyfile(temp_file_path, dest_zip_path)
-                    
                     # Se l'utente vuole estrarre nella cartella di destinazione
                     dest_dir = os.path.join(self.download_path, file_name)
                     if not os.path.exists(dest_dir):
                         os.makedirs(dest_dir)
                     
                     # Estrai tutti i file nella cartella di destinazione
-                    with zipfile.ZipFile(temp_file_path, 'r') as zip_ref:
+                    with zipfile.ZipFile(dest_zip_path, 'r') as zip_ref:
                         zip_ref.extractall(dest_dir)
                     
                 except zipfile.BadZipFile:
                     QApplication.restoreOverrideCursor()
                     QMessageBox.critical(self, "Error", "Il file scaricato non è un archivio ZIP valido.")
                     return
+            elif file_format == "csv":
+                # Per CSV, copialo direttamente
+                dest_csv_path = os.path.join(self.download_path, f"{file_name}.csv")
+                shutil.copyfile(temp_file_path, dest_csv_path)
+                
+                # Per il CSV, potrebbe essere necessario specificare il delimitatore e la geometria
+                if not save_only:
+                    # Imposta URI per caricare il CSV come layer (senza geometria)
+                    uri = f"file:///{dest_csv_path}?delimiter=,"
+                    qgis_file_path = uri
+                else:
+                    qgis_file_path = dest_csv_path
             else:
                 # Per GeoPackage (.gpkg), copialo direttamente
-                qgis_file_path = temp_file_path
                 dest_gpkg_path = os.path.join(self.download_path, f"{file_name}.gpkg")
                 shutil.copyfile(temp_file_path, dest_gpkg_path)
+                qgis_file_path = dest_gpkg_path
             
             self.progress_bar.setValue(80)
             
             # Carica il layer in QGIS solo se l'utente non ha scelto "solo salvataggio"
             if not save_only:
                 layer_name = f"ISTAT_{boundary_type}_{date_str}"
-                vector_layer = QgsVectorLayer(qgis_file_path, layer_name, "ogr")
+                
+                if file_format == "csv":
+                    # Per i CSV, utilizziamo un gestore specifico per dati non geografici
+                    vector_layer = QgsVectorLayer(uri, layer_name, "delimitedtext")
+                else:
+                    # Per shapefile e geopackage, utilizziamo ogr
+                    if file_format == "zip":
+                        # Per shapefile, usa il percorso al file .shp nella cartella estratta
+                        extracted_shp = os.path.join(dest_dir, shp_files[0])
+                        vector_layer = QgsVectorLayer(extracted_shp, layer_name, "ogr")
+                    else:
+                        vector_layer = QgsVectorLayer(qgis_file_path, layer_name, "ogr")
                 
                 if vector_layer.isValid():
                     # Add the layer to the map
@@ -491,6 +528,12 @@ class DownloaderDialog(QDialog):
             QMessageBox.critical(self, "Error", f"Si è verificato un errore: {str(e)}")
         
         finally:
+            # Pulisci la directory temporanea
+            try:
+                shutil.rmtree(temp_dir)
+            except:
+                pass
+            
             self.progress_bar.setVisible(False)
             QApplication.restoreOverrideCursor()
             
@@ -500,6 +543,11 @@ class DownloaderDialog(QDialog):
         if folder:
             self.download_path = folder
             self.save_path_edit.setText(folder)
+            
+    def update_format_notes(self):
+        """Mostra/nascondi note sui formati quando cambiano le selezioni"""
+        format_text = self.format_combo.currentText()
+        self.csv_note.setVisible("CSV" in format_text)
             
 # Required methods for QGIS plugin
 def classFactory(iface):
