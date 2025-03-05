@@ -34,6 +34,7 @@ L'interfaccia del plugin si presenta con le seguenti opzioni:
 3. **Formato**: Seleziona il formato di file desiderato
    - Shapefile (.zip)
    - GeoPackage (.gpkg)
+   - CSV (.csv)
 
 4. **Salva in**: Specifica la cartella di destinazione dove salvare i file scaricati
    - Clicca su "Sfoglia" per selezionare una cartella diversa
