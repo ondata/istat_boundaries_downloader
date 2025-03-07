@@ -324,6 +324,9 @@ class DownloaderDialog(QDialog):
         self.format_combo.currentIndexChanged.connect(self.update_format_notes)
         self.type_combo.currentIndexChanged.connect(self.update_region_filter_visibility)
         
+        # Aggiungi questa nuova connessione per aggiornare le province quando cambia la data
+        self.date_combo.currentIndexChanged.connect(self.update_filters_on_date_change)
+        
         # Inizializza anteprima URL
         self.update_url_preview()
         
@@ -866,6 +869,9 @@ class DownloaderDialog(QDialog):
         self.province_combo = QComboBox()
         self.province_combo.setMinimumWidth(300)
         self.province_combo.setMaximumWidth(300)
+        self.province_combo.setMaxVisibleItems(15)  # Aumenta il numero di elementi visibili
+        # Opzionalmente aggiungi uno stile per evidenziare la presenza di scrollbar
+        self.province_combo.setStyleSheet("QComboBox { combobox-popup: 0; padding: 5px; }")
         
         province_grid.addWidget(province_label, 1, 0)
         province_grid.addWidget(self.province_combo, 1, 1)
@@ -891,49 +897,56 @@ class DownloaderDialog(QDialog):
         # Memorizza la selezione corrente (se presente)
         current_data = self.province_combo.currentData() if self.province_combo.currentIndex() >= 0 else None
         
-        # Memorizza tutte le province in un attributo di classe se non esiste già
-        if not hasattr(self, 'all_provinces') or not self.all_provinces:
-            self.all_provinces = []
-            for i in range(self.province_combo.count()):
-                self.all_provinces.append({
-                    'text': self.province_combo.itemText(i),
-                    'data': self.province_combo.itemData(i)
-                })
+        # Se il testo è vuoto e abbiamo tutte le province memorizzate, ripristina l'elenco completo
+        if not text and hasattr(self, 'all_provinces') and self.all_provinces:
+            self.province_combo.blockSignals(True)
+            self.province_combo.clear()
+            
+            for province in self.all_provinces:
+                self.province_combo.addItem(province['text'], province['data'])
+                
+            # Ripristina la selezione precedente se possibile
+            if current_data is not None:
+                for i in range(self.province_combo.count()):
+                    if self.province_combo.itemData(i) == current_data:
+                        self.province_combo.setCurrentIndex(i)
+                        break
+                        
+            self.province_combo.blockSignals(False)
+            self.update_url_preview()
+            return
         
-        # Blocca segnali per evitare di attivare callback durante l'aggiornamento
-        self.province_combo.blockSignals(True)
-        self.province_combo.clear()
-        
-        # Aggiungi le province che corrispondono al criterio di ricerca
-        search_text = text.lower()
-        found_provinces = []
-        for province in self.all_provinces:
-            if search_text in province['text'].lower():
-                found_provinces.append(province)
-        
-        # Ordina le province trovate per numero di provincia
-        for province in sorted(found_provinces, key=lambda x: int(x['text'].split('-')[0]) if x['text'][0].isdigit() else 999):
-            self.province_combo.addItem(province['text'], province['data'])
-        
-        # Ripristina la selezione precedente se possibile
-        if current_data is not None:
-            for i in range(self.province_combo.count()):
-                if self.province_combo.itemData(i) == current_data:
-                    self.province_combo.setCurrentIndex(i)
-                    break
-        
-        # Sblocca i segnali
-        self.province_combo.blockSignals(False)
-        
-        # Se c'è solo una corrispondenza, selezionala automaticamente
-        if self.province_combo.count() == 1:
-            self.province_combo.setCurrentIndex(0)
-        
-        # Aggiorna l'anteprima dell'URL in base alla nuova selezione
-        self.update_url_preview()
+        # Solo se il testo non è vuoto, effettua il filtraggio
+        if text:
+            # Blocca segnali per evitare di attivare callback durante l'aggiornamento
+            self.province_combo.blockSignals(True)
+            self.province_combo.clear()
+            
+            # Aggiungi le province che corrispondono al criterio di ricerca
+            search_text = text.lower()
+            found_provinces = []
+            
+            if hasattr(self, 'all_provinces') and self.all_provinces:
+                for province in self.all_provinces:
+                    if search_text in province['text'].lower():
+                        found_provinces.append(province)
+            
+                # Mantieni l'ordine originale in cui le province erano nella lista
+                for province in found_provinces:
+                    self.province_combo.addItem(province['text'], province['data'])
+            
+            # Sblocca i segnali
+            self.province_combo.blockSignals(False)
+            
+            # Se c'è solo una corrispondenza, selezionala automaticamente
+            if self.province_combo.count() == 1:
+                self.province_combo.setCurrentIndex(0)
+            
+            # Aggiorna l'anteprima dell'URL in base alla nuova selezione
+            self.update_url_preview()
     
     def populate_province_combo(self):
-        """Popola il combo box delle province"""
+        """Popola il combo box delle province direttamente dai dati dell'API"""
         # Svuota prima il combo
         self.province_combo.clear()
         
@@ -944,34 +957,6 @@ class DownloaderDialog(QDialog):
         if hasattr(self, 'province_search'):
             self.province_search.clear()
         
-        # Mappa statica delle province italiane con formato "Codice-Nome"
-        province_predefinite = [
-            '1-Torino', '2-Vercelli', '3-Novara', '4-Cuneo', '5-Asti', '6-Alessandria', '7-Aosta', '8-Imperia', 
-            '9-Savona', '10-Genova', '11-La Spezia', '12-Varese', '13-Como', '14-Sondrio', '15-Milano', '16-Bergamo', 
-            '17-Brescia', '18-Pavia', '19-Cremona', '20-Mantova', '21-Bolzano', '22-Trento', '23-Verona', '24-Vicenza', 
-            '25-Belluno', '26-Treviso', '27-Venezia', '28-Padova', '29-Rovigo', '30-Udine', '31-Gorizia', '32-Trieste', 
-            '33-Piacenza', '34-Parma', '35-Reggio nell\'Emilia', '36-Modena', '37-Bologna', '38-Ferrara', '39-Ravenna', 
-            '40-Forlì-Cesena', '41-Pesaro e Urbino', '42-Ancona', '43-Macerata', '44-Ascoli Piceno', '45-Massa Carrara',
-            '46-Lucca', '47-Pistoia', '48-Firenze', '49-Livorno', '50-Pisa', '51-Arezzo', '52-Siena', '53-Grosseto', 
-            '54-Perugia', '55-Terni', '56-Viterbo', '57-Rieti', '58-Roma', '59-Latina', '60-Frosinone', '61-Caserta',
-            '62-Benevento', '63-Napoli', '64-Avellino', '65-Salerno', '66-L\'Aquila', '67-Teramo', '68-Pescara', 
-            '69-Chieti', '70-Campobasso', '71-Foggia', '72-Bari', '73-Taranto', '74-Brindisi', '75-Lecce', '76-Potenza', 
-            '77-Matera', '78-Cosenza', '79-Catanzaro', '80-Reggio di Calabria', '81-Trapani', '82-Palermo', '83-Messina', 
-            '84-Agrigento', '85-Caltanissetta', '86-Enna', '87-Catania', '88-Ragusa', '89-Siracusa', '90-Sassari', 
-            '91-Nuoro', '92-Cagliari', '93-Pordenone', '94-Isernia', '95-Oristano', '96-Biella', '97-Lecco', '98-Lodi', 
-            '99-Rimini', '100-Prato', '101-Crotone', '102-Vibo Valentia', '103-Verbano-Cusio-Ossola', '108-Monza e della Brianza', 
-            '109-Fermo', '110-Barletta-Andria-Trani', '111-Sud Sardegna'
-        ]
-        
-        # Crea un dizionario per lookup veloce
-        province_dict = {}
-        for prov in province_predefinite:
-            parts = prov.split('-', 1)
-            if len(parts) == 2:
-                cod_prov = parts[0]
-                nome_prov = parts[1]
-                province_dict[cod_prov] = nome_prov
-        
         # Imposta un placeholder mentre carica
         self.province_combo.addItem("Caricamento province...")
         QApplication.processEvents()
@@ -980,70 +965,132 @@ class DownloaderDialog(QDialog):
             # Ottieni la data corrente selezionata
             date_str = self.date_combo.currentText()
             
-            # Verifica se l'URL delle province è disponibile
+            # URL per ottenere l'elenco delle province
             provinces_url = f"{self.base_url}{date_str}/unita-territoriali-sovracomunali.csv"
             url_disponibile = self.check_url_exists(provinces_url)
             
-            # Usa sempre la lista predefinita che è più leggibile
-            self.province_combo.clear()
+            if not url_disponibile:
+                # Se l'URL non è disponibile, mostra un messaggio
+                QgsMessageLog.logMessage(f"URL province non disponibile: {provinces_url}", "ISTAT Downloader", Qgis.Warning)
+                self.province_combo.clear()
+                self.province_combo.addItem("Dati non disponibili per questa data")
+                return
             
-            # Se l'URL esiste, carica solo i codici e poi usa il dizionario per i nomi
-            province_attive = set()  # Set per monitorare quali province sono attive sul server
-            if url_disponibile:
-                try:
-                    # Scarica e leggi il CSV solo per conoscere quali province sono attualmente disponibili nell'API
-                    temp_file, _ = urllib.request.urlretrieve(provinces_url)
-                    
-                    with open(temp_file, 'r', encoding='utf-8') as f:
-                        # Salta l'intestazione
-                        next(f)
-                        for line in f:
-                            parts = line.strip().split(',')
-                            if len(parts) >= 1:
-                                cod_prov = parts[0].strip('"')
-                                province_attive.add(cod_prov)
-                except:
-                    # Se c'è un errore nel processare il CSV, usa tutte le province
-                    pass
+            # Scarica e leggi il CSV direttamente
+            province_from_api = []  # Lista per memorizzare le province dal CSV
             
-            # Aggiungi le province in ordine dalla lista predefinita
-            for prov in sorted(province_predefinite, key=lambda x: int(x.split('-')[0])):
-                parts = prov.split('-', 1)
-                if len(parts) == 2:
-                    cod_prov = parts[0]
-                    nome_prov = parts[1]
+            try:
+                temp_file, _ = urllib.request.urlretrieve(provinces_url)
+                
+                with open(temp_file, 'r', encoding='utf-8') as f:
+                    # Salta l'intestazione
+                    header_line = next(f)
+                    header = header_line.strip().split(',')
                     
-                    # Se stiamo filtrando in base alle province attive e questa provincia non è attiva, salta
-                    if url_disponibile and len(province_attive) > 0 and cod_prov not in province_attive:
-                        continue
+                    # Identifica gli indici delle colonne rilevanti
+                    col_indices = {}
+                    for i, col in enumerate(header):
+                        col_clean = col.strip('"')
+                        # Mappatura delle varie possibili denominazioni di colonne
+                        if col_clean in ['cod_prov', 'cod_ut', 'cod_provincia']:
+                            col_indices['cod_prov'] = i
+                        elif col_clean in ['den_prov', 'den_uts', 'den_provincia']:
+                            col_indices['den_prov'] = i
+                        elif col_clean in ['den_pcm', 'den_ita']:
+                            col_indices['den_pcm'] = i
+                        elif col_clean in ['sigla_prov', 'sigla', 'sigla_provincia']:
+                            col_indices['sigla'] = i
+                    
+                    # Se non troviamo il codice provincia, usa il primo campo
+                    if 'cod_prov' not in col_indices:
+                        col_indices['cod_prov'] = 0
+                    
+                    # Leggi tutte le righe e memorizza le province
+                    for line in f:
+                        parts = line.strip().split(',')
+                        if len(parts) <= col_indices['cod_prov']:
+                            continue  # Salta righe troppo corte
                         
-                    # Formatta in modo chiaro e leggibile
-                    self.province_combo.addItem(f"{cod_prov}-{nome_prov}", cod_prov)
+                        cod_prov = parts[col_indices['cod_prov']].strip('"')
+                        
+                        # Cerca il nome della provincia nelle varie colonne possibili
+                        nome_prov = None
+                        
+                        # Prima prova den_prov
+                        if 'den_prov' in col_indices and len(parts) > col_indices['den_prov']:
+                            nome_temp = parts[col_indices['den_prov']].strip('"')
+                            if nome_temp and nome_temp != "-":
+                                nome_prov = nome_temp
+                        
+                        # Se non trovato o è solo "-", prova den_pcm
+                        if (nome_prov is None or nome_prov == "-") and 'den_pcm' in col_indices and len(parts) > col_indices['den_pcm']:
+                            nome_temp = parts[col_indices['den_pcm']].strip('"')
+                            if nome_temp and nome_temp != "-":
+                                nome_prov = nome_temp
+                        
+                        # Se ancora non trovato, prova con la sigla
+                        if (nome_prov is None or nome_prov == "-") and 'sigla' in col_indices and len(parts) > col_indices['sigla']:
+                            nome_temp = parts[col_indices['sigla']].strip('"')
+                            if nome_temp and nome_temp != "-":
+                                nome_prov = nome_temp
+                        
+                        # Se ancora non abbiamo un nome valido, usa un valore di fallback
+                        if nome_prov is None or nome_prov == "-":
+                            nome_prov = f"Provincia {cod_prov}"
+                        
+                        # Formatta in modo chiaro e leggibile
+                        display_text = f"{cod_prov}-{nome_prov}"
+                        province_from_api.append((display_text, cod_prov))
+                
+                # Se abbiamo trovato province, usa quelle
+                if province_from_api:
+                    self.province_combo.clear()
+                    
+                    # Ordina le province per codice numerico
+                    province_from_api.sort(key=lambda x: int(x[1]) if x[1].isdigit() else float('inf'))
+                    
+                    # Aggiungi le province dal CSV
+                    for display_text, cod_prov in province_from_api:
+                        self.province_combo.addItem(display_text, cod_prov)
+                else:
+                    self.province_combo.clear()
+                    self.province_combo.addItem("Nessuna provincia trovata per questa data")
+            
+            except Exception as e:
+                # In caso di errore, mostra un messaggio
+                QgsMessageLog.logMessage(f"Errore nel processare CSV province: {str(e)}", "ISTAT Downloader", Qgis.Critical)
+                self.province_combo.clear()
+                self.province_combo.addItem(f"Errore: {str(e)}")
         
         except Exception as e:
-            QgsMessageLog.logMessage(f"Errore nel caricare le province: {str(e)}", "ISTAT Downloader", Qgis.Critical)
-            
-            # In caso di errore, mostra comunque la lista predefinita
+            QgsMessageLog.logMessage(f"Errore generale nel caricare le province: {str(e)}", "ISTAT Downloader", Qgis.Critical)
             self.province_combo.clear()
-            for prov in sorted(province_predefinite, key=lambda x: int(x.split('-')[0])):
-                parts = prov.split('-', 1)
-                if len(parts) == 2:
-                    cod_prov = parts[0]
-                    nome_prov = parts[1]
-                    self.province_combo.addItem(f"{cod_prov}-{nome_prov}", cod_prov)
+            self.province_combo.addItem("Errore nel caricare le province")
         
         # Aggiungi connessioni per aggiornare l'URL
         self.province_combo.currentIndexChanged.connect(self.update_url_preview)
         self.province_comuni_check.toggled.connect(self.update_url_preview)
         
-        # Alla fine del metodo, dopo aver popolato il combobox:
         # Salva tutte le province per uso futuro nella funzione di filtro
         self.all_provinces = []
         for i in range(self.province_combo.count()):
-            self.all_provinces.append({
-                'text': self.province_combo.itemText(i),
-                'data': self.province_combo.itemData(i)
-            })
+            item_text = self.province_combo.itemText(i)
+            if item_text not in ["Caricamento province...", "Dati non disponibili per questa data", 
+                                "Nessuna provincia trovata per questa data"]:
+                self.all_provinces.append({
+                    'text': item_text,
+                    'data': self.province_combo.itemData(i)
+                })
+    
+    def update_filters_on_date_change(self):
+        """Aggiorna i filtri quando cambia la data"""
+        # Aggiorna il filtro regioni se è visibile
+        if self.region_filter_container.isVisible():
+            self.populate_region_combo()
+        
+        # Aggiorna il filtro province se è visibile
+        if hasattr(self, 'province_filter_container') and self.province_filter_container.isVisible():
+            self.populate_province_combo()
     
 # Required methods for QGIS plugin
 def classFactory(iface):
