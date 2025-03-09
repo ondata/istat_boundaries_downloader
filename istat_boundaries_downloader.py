@@ -39,7 +39,7 @@ from qgis.PyQt.QtWidgets import (QAction, QDialog, QVBoxLayout, QHBoxLayout,
                                QFrame, QFormLayout, QGroupBox, QGridLayout)  # Aggiunto QLineEdit
 from qgis.PyQt.QtGui import QIcon, QCursor, QDesktopServices
 from qgis.core import QgsProject, QgsVectorLayer, Qgis, QgsMessageLog
-from qgis.PyQt.QtCore import QSize
+from qgis.PyQt.QtCore import QSize, QTimer  # Aggiunto QTimer
 
 class IstatBoundariesDownloader:
     """QGIS Plugin to download Italian administrative boundaries from onData API"""
@@ -187,23 +187,32 @@ class DownloaderDialog(QDialog):
         region_grid.setContentsMargins(0, 0, 0, 0)
         region_grid.setSpacing(10)
         
-        # Selezione regione (riga 2)
+        # Checkbox per attivare filtro per singola regione (riga 0)
+        self.region_filter_check = QCheckBox("Filtra per singola regione")
+        self.region_filter_check.setChecked(False)  # Default: NON selezionato (scarica tutta Italia)
+        self.region_filter_check.setLayoutDirection(Qt.RightToLeft)  # Allinea a destra
+        region_grid.addWidget(self.region_filter_check, 0, 1, 1, 1, Qt.AlignLeft)  # Allineato a sinistra
+        
+        # Selezione regione (riga 1)
         region_label = QLabel("Filtro regione:")
         region_label.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
         self.region_combo = QComboBox()
         self.region_combo.setMinimumWidth(300)
-        region_grid.addWidget(region_label, 0, 0)
-        region_grid.addWidget(self.region_combo, 0, 1)
+        region_grid.addWidget(region_label, 1, 0)
+        region_grid.addWidget(self.region_combo, 1, 1)
         
-        # Selezione tipo dati regione (riga 3)
+        # Selezione tipo dati regione (riga 2)
         region_data_label = QLabel("Scarica:")
         region_data_label.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
         self.region_data_combo = QComboBox()
         self.region_data_combo.setMinimumWidth(300)
         self.region_data_combo.addItem("Province della regione")
         self.region_data_combo.addItem("Comuni della regione")
-        region_grid.addWidget(region_data_label, 1, 0)
-        region_grid.addWidget(self.region_data_combo, 1, 1)
+        region_grid.addWidget(region_data_label, 2, 0)
+        region_grid.addWidget(self.region_data_combo, 2, 1)
+        
+        # Connessione per aggiornare lo stato di abilitazione del combo regione
+        self.region_filter_check.toggled.connect(self.update_region_filter_state)
         
         # Nascondi il filtro regione inizialmente
         self.region_filter_container.setVisible(False)
@@ -276,10 +285,44 @@ class DownloaderDialog(QDialog):
         url_section.setStyleSheet("QGroupBox { font-weight: bold; }")
         url_layout = QVBoxLayout(url_section)
         
+        # Layout orizzontale per l'URL e il pulsante di copia
+        url_row_layout = QHBoxLayout()
+        
         self.url_preview = QLabel()
         self.url_preview.setStyleSheet("font-family: monospace; padding: 8px; background-color: #f8f8f8; border: 1px solid #ddd; border-radius: 4px;")
         self.url_preview.setWordWrap(True)
-        url_layout.addWidget(self.url_preview)
+        url_row_layout.addWidget(self.url_preview)
+        
+        # Pulsante per copiare l'URL negli appunti
+        self.copy_url_button = QPushButton()
+        self.copy_url_button.setIcon(QIcon(":/images/themes/default/mActionEditCopy.svg"))
+        self.copy_url_button.setToolTip("Copia URL negli appunti")
+        self.copy_url_button.setFixedSize(36, 36)
+        self.copy_url_button.setStyleSheet("""
+            QPushButton {
+                background-color: #e3f2fd; 
+                border: 1px solid #90caf9; 
+                border-radius: 4px;
+                padding: 4px;
+            }
+            QPushButton:hover {
+                background-color: #bbdefb;
+            }
+            QPushButton:pressed {
+                background-color: #64b5f6;
+            }
+        """)
+        self.copy_url_button.clicked.connect(self.copy_url_to_clipboard)
+        url_row_layout.addWidget(self.copy_url_button)
+        
+        url_layout.addLayout(url_row_layout)
+        
+        # Etichetta per feedback sulla copia
+        self.copy_feedback = QLabel()
+        self.copy_feedback.setAlignment(Qt.AlignRight)
+        self.copy_feedback.setStyleSheet("color: #4CAF50; font-style: italic; font-size: 11px;")
+        self.copy_feedback.setVisible(False)
+        url_layout.addWidget(self.copy_feedback)
         
         layout.addWidget(url_section)
         
@@ -324,8 +367,9 @@ class DownloaderDialog(QDialog):
         self.format_combo.currentIndexChanged.connect(self.update_format_notes)
         self.type_combo.currentIndexChanged.connect(self.update_region_filter_visibility)
         
-        # Aggiungi questa nuova connessione per aggiornare le province quando cambia la data
-        self.date_combo.currentIndexChanged.connect(self.update_filters_on_date_change)
+        # Aggiungi le connessioni per il checkbox
+        self.region_filter_check.toggled.connect(self.update_region_filter_state)
+        self.region_filter_check.toggled.connect(self.update_url_preview)
         
         # Inizializza anteprima URL
         self.update_url_preview()
@@ -445,6 +489,7 @@ class DownloaderDialog(QDialog):
             if (selected_type == "Regioni" and 
                 self.region_filter_container.isVisible() and 
                 self.region_combo.count() > 0 and 
+                self.region_filter_check.isChecked() and  # Verifica se il filtro è attivato
                 self.region_combo.currentText() != "Caricamento regioni..." and
                 self.region_combo.currentText() != "Errore nel caricare le regioni"):
                 
@@ -776,6 +821,9 @@ class DownloaderDialog(QDialog):
             self.region_combo.currentIndexChanged.connect(self.update_url_preview)
             self.region_data_combo.currentIndexChanged.connect(self.update_url_preview)
             
+            # Imposta lo stato iniziale delle opzioni del filtro regione
+            self.update_region_filter_state(self.region_filter_check.isChecked())
+            
         except Exception as e:
             QgsMessageLog.logMessage(f"Errore nel caricare le regioni: {str(e)}", "ISTAT Downloader", Qgis.Critical)
             self.region_combo.clear()
@@ -793,6 +841,7 @@ class DownloaderDialog(QDialog):
             if (selected_type == "Regioni" and 
                 self.region_filter_container.isVisible() and 
                 self.region_combo.count() > 0 and 
+                self.region_filter_check.isChecked() and  # Verifica se il filtro è attivato
                 self.region_combo.currentText() != "Caricamento regioni..." and
                 self.region_combo.currentText() != "Errore nel caricare le regioni"):
                 
@@ -825,12 +874,16 @@ class DownloaderDialog(QDialog):
             # Costruisce l'URL completo
             url = f"{self.base_url}{date_str}/{boundary_type}.{file_format}"
             
+            # Salva l'URL corrente come attributo della classe
+            self.current_url = url
+            
             # Aggiorna l'etichetta di anteprima con URL formattato
             self.url_preview.setText(url)
             
         except Exception as e:
             self.url_preview.setText(f"Errore nell'aggiornare l'URL: {str(e)}")
-    
+            self.current_url = ""
+
     def create_province_filter(self):
         """Crea e configura il container per il filtro province"""
         # Container per filtro province
@@ -1091,6 +1144,45 @@ class DownloaderDialog(QDialog):
         # Aggiorna il filtro province se è visibile
         if hasattr(self, 'province_filter_container') and self.province_filter_container.isVisible():
             self.populate_province_combo()
+    
+    def copy_url_to_clipboard(self):
+        """Copia l'URL corrente negli appunti del sistema"""
+        if hasattr(self, 'current_url') and self.current_url:
+            # Copia negli appunti
+            clipboard = QApplication.clipboard()
+            clipboard.setText(self.current_url)
+            
+            # Mostra feedback all'utente
+            self.copy_feedback.setText("URL copiato negli appunti!")
+            self.copy_feedback.setVisible(True)
+            
+            # Nascondi il messaggio dopo 2 secondi
+            QTimer.singleShot(2000, lambda: self.copy_feedback.setVisible(False))
+        else:
+            # Nessun URL valido disponibile
+            self.copy_feedback.setText("Nessun URL valido disponibile")
+            self.copy_feedback.setStyleSheet("color: #F44336; font-style: italic; font-size: 11px;")
+            self.copy_feedback.setVisible(True)
+            
+            # Nascondi il messaggio dopo 2 secondi
+            QTimer.singleShot(2000, lambda: self.copy_feedback.setVisible(False))
+    
+    def update_region_filter_state(self, checked):
+        """Aggiorna lo stato del filtro regioni in base alla checkbox"""
+        # Abilita il combo delle regioni e il combo del tipo di dati solo se il filtro è attivato
+        self.region_combo.setEnabled(checked)
+        self.region_data_combo.setEnabled(checked)
+        
+        # Se il filtro è disabilitato, i campi di selezione regione diventano grigi
+        if not checked:
+            self.region_combo.setStyleSheet("color: #999999;")
+            self.region_data_combo.setStyleSheet("color: #999999;")
+        else:
+            self.region_combo.setStyleSheet("")
+            self.region_data_combo.setStyleSheet("")
+        
+        # Aggiorna l'URL preview
+        self.update_url_preview()
     
 # Required methods for QGIS plugin
 def classFactory(iface):
