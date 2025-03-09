@@ -67,6 +67,11 @@ Quando scarichi i confini amministrativi, il plugin:
    - Salva il file GPKG nella cartella di destinazione
    - Carica il layer in QGIS (se l'opzione "Solo salvataggio locale" non è selezionata)
 
+3. **Per CSV (.csv)**:
+   - Salva il file CSV nella cartella di destinazione
+   - Carica il file come layer di testo in QGIS (se l'opzione "Solo salvataggio locale" non è selezionata)
+   - Nota: i file CSV non contengono geometrie ma solo dati tabulari dei confini amministrativi
+
 ## Risoluzione dei Problemi
 
 ### Risorsa non Disponibile
@@ -79,10 +84,21 @@ In caso di errori durante il download o l'elaborazione dei file:
 1. Controlla la tua connessione Internet
 2. Verifica di avere i permessi necessari per scrivere nella cartella di destinazione
 3. Consulta il log di QGIS (Menu > Visualizza > Pannelli > Log Messaggi) per dettagli sull'errore
+4. Assicurati che non ci siano restrizioni di rete o firewall che bloccano l'accesso all'API
+
+## Compatibilità
+
+Il plugin è stato testato sulle seguenti versioni di QGIS:
+- QGIS 3.16 e successive
+- Compatibile con Windows, macOS e Linux
 
 ## Riferimenti
 I dati sono forniti dall'API onData disponibile su [www.confini-amministrativi.it](https://www.confini-amministrativi.it/)
 
+## Licenza
+Questo plugin è rilasciato sotto licenza GPL v3.0.
+
 ---
 
 *Plugin sviluppato da Totò Fiandaca - pigrecoinfinito@gmail.com*
+*Repository GitHub: [confini-amministrativi-istat_qgis_plugin](https://github.com/pigreco/confini-amministrativi-istat_qgis_plugin)*
