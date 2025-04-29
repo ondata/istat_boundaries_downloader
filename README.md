@@ -1,7 +1,5 @@
 # ISTAT Boundaries Downloader - Plugin QGIS
 
-![Logo Plugin](icon.png)
-
 ## Descrizione
 Un plugin QGIS per scaricare i confini amministrativi italiani forniti dall'ISTAT (Istituto Nazionale di Statistica) attraverso le API di onData. Consente di accedere facilmente ai dati geografici ufficiali delle divisioni amministrative italiane con differenti date di riferimento.
 
@@ -19,6 +17,8 @@ Un plugin QGIS per scaricare i confini amministrativi italiani forniti dall'ISTA
   - Filtro per provincia (con possibilità di scaricare comuni della provincia selezionata)
 - **Caricamento automatico** dei dati scaricati in QGIS
 - **Interfaccia semplice e intuitiva** con anteprima dell'URL di download
+
+![Logo Plugin](./imgs/gui.png)
 
 ## Installazione
 
