@@ -1,104 +1,87 @@
-# Guida al Plugin ISTAT Boundaries Downloader per QGIS
+# ISTAT Boundaries Downloader - Plugin QGIS
 
-## Introduzione
-ISTAT Boundaries Downloader è un plugin per QGIS che ti permette di scaricare i confini amministrativi italiani forniti dall'ISTAT (Istituto Nazionale di Statistica) tramite l'API onData. Questo strumento semplifica l'acquisizione dei dati geografici ufficiali per regioni, province, comuni e ripartizioni geografiche dell'Italia, con la possibilità di selezionare diverse date di riferimento.
+![Logo Plugin](icon.png)
+
+## Descrizione
+Un plugin QGIS per scaricare i confini amministrativi italiani forniti dall'ISTAT (Istituto Nazionale di Statistica) attraverso le API di onData. Consente di accedere facilmente ai dati geografici ufficiali delle divisioni amministrative italiane con differenti date di riferimento.
+
+## Caratteristiche principali
+
+- **Download di confini amministrativi italiani** in diversi formati (Shapefile, GeoPackage, CSV)
+- **Selezione della data di riferimento** da un catalogo che va dal 1991 al 2024
+- **Diverse tipologie di confini**:
+  - Regioni
+  - Province (Unità Territoriali Sovracomunali)
+  - Comuni
+  - Ripartizioni geografiche
+- **Funzionalità di filtro**:
+  - Filtro per regione (con possibilità di scaricare province o comuni della regione selezionata)
+  - Filtro per provincia (con possibilità di scaricare comuni della provincia selezionata)
+- **Caricamento automatico** dei dati scaricati in QGIS
+- **Interfaccia semplice e intuitiva** con anteprima dell'URL di download
 
 ## Installazione
 
-1. Apri QGIS
-2. Dal menu, seleziona **Plugin > Gestisci e installa plugin**
-3. Vai alla scheda "Installa da ZIP"
-4. Seleziona il file ZIP del plugin
-5. Clicca su "Installa plugin"
+1. Scarica il plugin come file ZIP
+2. In QGIS, vai su **Plugin → Gestisci e installa plugin**
+3. Seleziona la scheda **Installa da ZIP**
+4. Sfoglia e seleziona il file ZIP scaricato
+5. Clicca su **Installa plugin**
 
 Dopo l'installazione, troverai l'icona del plugin nella barra degli strumenti di QGIS.
 
-## Utilizzo del Plugin
+## Guida all'uso
 
-### Avvio del Plugin
-Clicca sull'icona ![icona plugin](icon.png) nella barra degli strumenti o accedi dal menu **Plugin > ISTAT Boundaries Downloader**.
+### Interfaccia utente
 
-### Interfaccia Principale
-L'interfaccia del plugin si presenta con le seguenti opzioni:
+Il plugin presenta un'interfaccia divisa in sezioni:
 
-1. **Data di riferimento**: Seleziona la data di riferimento per i confini amministrativi
-   - Le date disponibili vanno dal 1991 al 2024
-   - Il formato è AAAAMMGG (Anno-Mese-Giorno)
+#### Selezione dei dati
+- **Data di riferimento**: scegli la data per i confini (formato AAAAMMGG)
+- **Tipo di confine**: seleziona il tipo di entità amministrativa da scaricare
+- **Filtri**: quando applicabile, puoi filtrare per regione o provincia
+- **Formato**: scegli tra Shapefile (.zip), GeoPackage (.gpkg) o CSV (.csv)
 
-2. **Tipo di confine**: Scegli il tipo di confine amministrativo da scaricare
-   - Regioni
-   - Unità Territoriali Sovracomunali (Province)
-   - Comuni
-   - Ripartizioni Geografiche
+#### Opzioni di salvataggio
+- **Cartella di destinazione**: dove salvare i file scaricati
+- **Solo salvataggio locale**: opzione per salvare i file senza caricarli automaticamente in QGIS
 
-3. **Formato**: Seleziona il formato di file desiderato
-   - Shapefile (.zip)
-   - GeoPackage (.gpkg)
-   - CSV (.csv)
+#### URL di download
+Visualizza l'URL che sarà utilizzato per il download, con possibilità di copiarlo negli appunti.
 
-4. **Salva in**: Specifica la cartella di destinazione dove salvare i file scaricati
-   - Clicca su "Sfoglia" per selezionare una cartella diversa
+### Procedura di download
 
-5. **Solo salvataggio locale**: Se selezionato, i dati verranno solo salvati localmente senza essere caricati automaticamente in QGIS
+1. Seleziona la data di riferimento desiderata
+2. Scegli il tipo di confine amministrativo
+3. Applica eventuali filtri per regione o provincia
+4. Seleziona il formato di output
+5. Imposta la cartella di destinazione
+6. Clicca su "Scarica"
 
-6. **URL di download**: Visualizza l'URL che sarà utilizzato per scaricare i dati
+### Funzionalità avanzate
 
-### Funzionalità Principali
+#### Filtro per regione
+Quando selezioni "Regioni" come tipo di confine, puoi attivare il filtro per visualizzare:
+- Province di una specifica regione
+- Comuni di una specifica regione
 
-#### Download dei Confini
-1. Seleziona le opzioni desiderate
-2. Clicca sul pulsante "Sfoglia" per scegliere la cartella di destinazione
-3. Se desiderato, seleziona l'opzione "Solo salvataggio locale"
-4. Clicca sul pulsante "Scarica"
-5. Il plugin scaricherà i dati e:
-   - Salverà i file nella cartella specificata
-   - Se non hai selezionato "Solo salvataggio locale", caricherà automaticamente il layer in QGIS
+#### Filtro per provincia
+Quando selezioni "Province" come tipo di confine, puoi:
+- Cercare una provincia specifica tramite il campo di ricerca
+- Scaricare solo i comuni appartenenti alla provincia selezionata
 
-### Risultati del Download
-
-Quando scarichi i confini amministrativi, il plugin:
-
-1. **Per Shapefile (.zip)**:
-   - Salva il file ZIP nella cartella di destinazione
-   - Estrae i file nella sottocartella con un nome descrittivo
-   - Carica il layer in QGIS (se l'opzione "Solo salvataggio locale" non è selezionata)
-
-2. **Per GeoPackage (.gpkg)**:
-   - Salva il file GPKG nella cartella di destinazione
-   - Carica il layer in QGIS (se l'opzione "Solo salvataggio locale" non è selezionata)
-
-3. **Per CSV (.csv)**:
-   - Salva il file CSV nella cartella di destinazione
-   - Carica il file come layer di testo in QGIS (se l'opzione "Solo salvataggio locale" non è selezionata)
-   - Nota: i file CSV non contengono geometrie ma solo dati tabulari dei confini amministrativi
-
-## Risoluzione dei Problemi
-
-### Risorsa non Disponibile
-Se ricevi un messaggio "Risorsa non disponibile", significa che la combinazione di data e tipo di confine selezionata non esiste. Puoi:
-1. Cliccare su "Sì" per visualizzare date alternative suggerite
-2. Scegliere una delle date suggerite e riprovare
-
-### Altri Errori
-In caso di errori durante il download o l'elaborazione dei file:
-1. Controlla la tua connessione Internet
-2. Verifica di avere i permessi necessari per scrivere nella cartella di destinazione
-3. Consulta il log di QGIS (Menu > Visualizza > Pannelli > Log Messaggi) per dettagli sull'errore
-4. Assicurati che non ci siano restrizioni di rete o firewall che bloccano l'accesso all'API
-
-## Compatibilità
-
-Il plugin è stato testato sulle seguenti versioni di QGIS:
-- QGIS 3.16 e successive
-- Compatibile con Windows, macOS e Linux
-
-## Riferimenti
-I dati sono forniti dall'API onData disponibile su [www.confini-amministrativi.it](https://www.confini-amministrativi.it/)
+## Requisiti di sistema
+- QGIS 3.20 o successivo
+- Connessione Internet per l'accesso alle API
 
 ## Licenza
 Questo plugin è rilasciato sotto licenza GPL v3.0.
 
----
+## Crediti
+- **Sviluppatore**: Totò Fiandaca
+- **Email**: pigrecoinfinito@gmail.com
+- **Dati**: forniti dalle API di [confini-amministrativi.it](https://www.confini-amministrativi.it/)
+- **Repository**: [GitHub](https://github.com/ondata/confini-amministrativi-istat_qgis_plugin)
 
-*Plugin sviluppato da Totò Fiandaca - pigrecoinfinito@gmail.com*
-*Repository GitHub: [confini-amministrativi-istat_qgis_plugin](https://github.com/pigreco/confini-amministrativi-istat_qgis_plugin)*
+## Segnalazione problemi
+Per segnalare bug o richiedere nuove funzionalità, visita la [pagina delle issues](https://github.com/ondata/confini-amministrativi-istat_qgis_plugin/issues) su GitHub.
