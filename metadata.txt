@@ -1,21 +1,50 @@
+# This file contains metadata for your plugin.
+
+# This file should be included when you package your plugin.# Mandatory items:
+
 [general]
 name=ISTAT Boundaries Downloader
+supportsQt6=True
+qgisMinimumVersion=3.43
 description=Download Italian administrative boundaries (ISTAT) from onData API
-version=1.0.0
-qgisMinimumVersion=3.20
-qgisMaximumVersion=3.99
-
-author=Totò Fiandaca
+version=1.0
+author=Salvatore Fiandaca, Giulio Fattori
 email=pigrecoinfinito@gmail.com
 
-tags=api, topojson, json, csv, geojson, gis, openapi, geopackage, shapefile, anpr, istat, italia, ontopia, ondata, geobuf, geoparquet
+about=This plugin allows downloading Italian administrative boundaries (ISTAT) through the onData API. It enables users to access, download and work with official Italian administrative boundary data directly within QGIS. The plugin is compatible with QGIS 3.43+ and Qt6, and operates in the background.
 
-about=This plugin allows you to download Italian administrative boundaries from the onData API. It supports various boundary types (regions, provinces, municipalities) at different dates.
-repository=https://github.com/ondata/confini-amministrativi-istat_qgis_plugin/blob/main/README.md
 tracker=https://github.com/ondata/confini-amministrativi-istat_qgis_plugin/issues
-homepage=https://www.ondata.it/
+repository=https://github.com/ondata/confini-amministrativi-istat_qgis_plugin/blob/main/README.md
+# End of mandatory metadata
 
-category=Vector
+# Recommended items:
+
+hasProcessingProvider=no
+# Uncomment the following line and add your changelog:
+changelog= v 0.1 Pubblicazione plugin
+changelog= v 1.0 Aggiornamento per compatibilità con QGIS 3.43+ e Qt6
+
+# Tags are comma separated with spaces allowed
+tags=catasto, particelle, fogli, regione, italia, qt6
+
+homepage=https://github.com/ondata/confini-amministrativi-istat_qgis_plugin/blob/main/README.md
+category=Plugins
 icon=icon.png
+# experimental flag
 experimental=False
+
+# deprecated flag (applies to the whole plugin, not just a single version)
 deprecated=False
+
+# Since QGIS 3.8, a comma separated list of plugins to be installed
+# (or upgraded) can be specified.
+# Check the documentation for more information.
+# plugin_dependencies=
+
+Category of the plugin:Vector, GPKG, Geojson, shp, KML, KMZ, csv
+# category=
+
+# If the plugin can run on QGIS Server.
+server=False
+
+

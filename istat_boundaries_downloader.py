@@ -31,15 +31,77 @@ import http.client
 from datetime import datetime
 import shutil  # Aggiungi importazione per operazioni sui file
 
-from qgis.PyQt.QtCore import Qt, QUrl
-from qgis.PyQt.QtWidgets import (QAction, QDialog, QVBoxLayout, QHBoxLayout, 
-                               QLabel, QComboBox, QPushButton, 
-                               QProgressBar, QMessageBox, QApplication,
-                               QFileDialog, QCheckBox, QWidget, QLineEdit,
-                               QFrame, QFormLayout, QGroupBox, QGridLayout)  # Aggiunto QLineEdit
-from qgis.PyQt.QtGui import QIcon, QCursor, QDesktopServices
-from qgis.core import QgsProject, QgsVectorLayer, Qgis, QgsMessageLog
-from qgis.PyQt.QtCore import QSize, QTimer  # Aggiunto QTimer
+# Determina la versione di Qt
+from qgis.PyQt.QtCore import QT_VERSION_STR
+from qgis.core import Qgis, QgsMessageLog
+QgsMessageLog.logMessage(f"ISTAT Boundaries Downloader: Usando Qt {QT_VERSION_STR}", "ISTAT Boundaries", Qgis.Info)
+
+# Importazioni condizionali per compatibilità Qt5/Qt6
+try:
+    # Qt6
+    from qgis.PyQt.QtGui import QAction
+    from qgis.PyQt.QtCore import QSize, QTimer, Qt, QUrl
+    USE_QT6 = True
+except ImportError:
+    # Qt5
+    from qgis.PyQt.QtWidgets import QAction
+    from qgis.PyQt.QtCore import QSize, QTimer, Qt, QUrl
+    USE_QT6 = False
+
+# Importazioni comuni
+from qgis.PyQt.QtWidgets import (QDialog, QVBoxLayout, QHBoxLayout, 
+                              QLabel, QComboBox, QPushButton, 
+                              QProgressBar, QMessageBox, QApplication,
+                              QFileDialog, QCheckBox, QWidget, QLineEdit,
+                              QFrame, QFormLayout, QGroupBox, QGridLayout)
+
+from qgis.PyQt.QtGui import QIcon, QCursor
+from qgis.core import QgsProject, QgsVectorLayer
+
+# Funzioni helper per gestire le differenze Qt5/Qt6
+def get_alignment(right=False, vcenter=False, hcenter=False, left=False):
+    """Restituisce le costanti di allineamento appropriate per Qt5/Qt6"""
+    if USE_QT6:
+        # Qt6
+        alignment = Qt.AlignmentFlag.AlignTop  # Valore predefinito
+        if right:
+            alignment |= Qt.AlignmentFlag.AlignRight
+        if vcenter:
+            alignment |= Qt.AlignmentFlag.AlignVCenter
+        if hcenter:
+            alignment |= Qt.AlignmentFlag.AlignHCenter
+        if left:
+            alignment |= Qt.AlignmentFlag.AlignLeft
+        return alignment
+    else:
+        # Qt5
+        alignment = Qt.AlignTop  # Valore predefinito
+        if right:
+            alignment |= Qt.AlignRight
+        if vcenter:
+            alignment |= Qt.AlignVCenter
+        if hcenter:
+            alignment |= Qt.AlignHCenter
+        if left:
+            alignment |= Qt.AlignLeft
+        return alignment
+
+def get_layout_direction(rtl=False):
+    """Restituisce la direzione di layout appropriata per Qt5/Qt6"""
+    if USE_QT6:
+        return Qt.LayoutDirection.RightToLeft if rtl else Qt.LayoutDirection.LeftToRight
+    else:
+        return Qt.RightToLeft if rtl else Qt.LeftToRight
+
+# Per aprire URL esterni
+def open_web_url(self, url):
+    """Apre un URL nel browser predefinito"""
+    if USE_QT6:
+        from qgis.PyQt.QtGui import QDesktopServices
+    else:
+        from qgis.PyQt.QtCore import QDesktopServices
+    
+    QDesktopServices.openUrl(QUrl(url))
 
 class IstatBoundariesDownloader:
     """QGIS Plugin to download Italian administrative boundaries from onData API"""
@@ -138,7 +200,7 @@ class DownloaderDialog(QDialog):
         
         # 1. Selezione data (riga 0)
         date_label = QLabel("Data di riferimento (>=1991):")
-        date_label.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
+        date_label.setAlignment(get_alignment(right=True, vcenter=True))
         self.date_combo = QComboBox()
         
         # Aggiunge date in gruppi logici
@@ -166,7 +228,7 @@ class DownloaderDialog(QDialog):
         
         # 2. Selezione tipo di confine (riga 1)
         type_label = QLabel("Tipo di confine amministrativo:")
-        type_label.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
+        type_label.setAlignment(get_alignment(right=True, vcenter=True))
         self.type_combo = QComboBox()
         tipi_confine_ordinati = [
             "Ripartizioni Geografiche",
@@ -192,12 +254,12 @@ class DownloaderDialog(QDialog):
         # Checkbox per attivare filtro per singola regione (riga 0)
         self.region_filter_check = QCheckBox("Filtra per singola regione")
         self.region_filter_check.setChecked(False)  # Default: NON selezionato (scarica tutta Italia)
-        self.region_filter_check.setLayoutDirection(Qt.RightToLeft)  # Allinea a destra
-        region_grid.addWidget(self.region_filter_check, 0, 1, 1, 1, Qt.AlignLeft)  # Allineato a sinistra
+        self.region_filter_check.setLayoutDirection(get_layout_direction(rtl=True))
+        region_grid.addWidget(self.region_filter_check, 0, 1, 1, 1, get_alignment(left=True))
         
         # Selezione regione (riga 1)
         region_label = QLabel("Filtro regione:")
-        region_label.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
+        region_label.setAlignment(get_alignment(right=True, vcenter=True))
         self.region_combo = QComboBox()
         self.region_combo.setMinimumWidth(300)
         region_grid.addWidget(region_label, 1, 0)
@@ -205,7 +267,7 @@ class DownloaderDialog(QDialog):
         
         # Selezione tipo dati regione (riga 2)
         region_data_label = QLabel("Scarica:")
-        region_data_label.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
+        region_data_label.setAlignment(get_alignment(right=True, vcenter=True))
         self.region_data_combo = QComboBox()
         self.region_data_combo.setMinimumWidth(300)
         self.region_data_combo.addItem("Province della regione")
@@ -222,7 +284,7 @@ class DownloaderDialog(QDialog):
         
         # 4. Selezione formato (riga 4)
         format_label = QLabel("Formato disponibile:")
-        format_label.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
+        format_label.setAlignment(get_alignment(right=True, vcenter=True))
         self.format_combo = QComboBox()
         for label in self.formats.keys():
             self.format_combo.addItem(label)
@@ -263,7 +325,7 @@ class DownloaderDialog(QDialog):
         
         # Selezione percorso di salvataggio
         save_path_label = QLabel("Salva in:")
-        save_path_label.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
+        save_path_label.setAlignment(get_alignment(right=True, vcenter=True))
         self.save_path_edit = QLabel("Seleziona una cartella di destinazione...")
         self.save_path_edit.setStyleSheet("font-family: monospace; padding: 8px; background-color: #f8f8f8; border: 1px solid #ddd; border-radius: 4px;")
         self.save_path_edit.setWordWrap(True)
@@ -378,6 +440,16 @@ class DownloaderDialog(QDialog):
         # Aggiungi le connessioni per il checkbox
         self.region_filter_check.toggled.connect(self.update_region_filter_state)
         self.region_filter_check.toggled.connect(self.update_url_preview)
+        
+        # Connessione ai segnali in modo compatibile
+        if USE_QT6:
+            # Qt6
+            self.copy_url_button.clicked.connect(self.copy_url_to_clipboard)
+            self.browse_button.clicked.connect(self.browse_folder)
+        else:
+            # Qt5 (stesso comportamento, ma è buona pratica essere espliciti)
+            self.copy_url_button.clicked.connect(self.copy_url_to_clipboard)
+            self.browse_button.clicked.connect(self.browse_folder)
         
         # Inizializza anteprima URL
         self.update_url_preview()
@@ -942,7 +1014,7 @@ class DownloaderDialog(QDialog):
 
         # Campo di ricerca provincia
         search_label = QLabel("Cerca provincia:")
-        search_label.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
+        search_label.setAlignment(get_alignment(right=True, vcenter=True))
         search_label.setFixedWidth(200)
         
         # Nuova configurazione con dimensione esplicita
@@ -960,7 +1032,7 @@ class DownloaderDialog(QDialog):
         
         # Selezione provincia
         province_label = QLabel("Filtro provincia:")
-        province_label.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
+        province_label.setAlignment(get_alignment(right=True, vcenter=True))
         province_label.setFixedWidth(200)
         
         # MODIFICA: Configurazione provincia combo uniforme

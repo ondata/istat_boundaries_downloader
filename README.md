@@ -19,8 +19,15 @@ Un plugin QGIS per scaricare i confini amministrativi italiani forniti dall'ISTA
 - **Interfaccia semplice e intuitiva** con anteprima dell'URL di download
 - **Copia URL negli appunti** per uso esterno
 - **Barra di progresso** durante il download
+- **Compatibilità universale** con QGIS versioni 3.16+ (supporto sia per Qt5 che Qt6)
 
 ![Logo Plugin](./imgs/gui_2.png)
+
+## Novità nella versione 1.0.0
+- **Supporto per formati KML e KMZ**: aggiunti i formati KML e KMZ per la visualizzazione in Google Earth e altri visualizzatori GIS
+- **Compatibilità universale**: funziona sia con QGIS basato su Qt5 (versioni 3.16-3.22) che con QGIS basato su Qt6 (versioni 3.28+)
+- **Miglioramenti all'interfaccia utente**: layout ottimizzato e messaggi informativi per i diversi formati
+- **Gestione migliorata dei download**: barra di progresso più reattiva e gestione degli errori
 
 ## Installazione
 
@@ -79,9 +86,18 @@ Quando selezioni "Province" come tipo di confine, puoi:
 - I file ZIP scaricati vengono automaticamente estratti nella cartella di destinazione
 - Il plugin crea sottocartelle organizzate per tipo di confine e data
 
+#### Utilizzo dei formati KML/KMZ
+- I file KML possono essere visualizzati direttamente in QGIS e Google Earth
+- I file KMZ sono una versione compressa del KML, ideale per condividere i dati
+- Per utilizzare KMZ in Google Earth, basta trascinare il file nell'applicazione
+
 ## Requisiti di sistema
-- QGIS 3.20 o successivo
+- QGIS 3.16 o successivo (compatibile sia con Qt5 che con Qt6)
 - Connessione Internet per l'accesso alle API
+
+## Compatibilità
+- **QGIS 3.16-3.22**: Plugin funzionante con interfaccia basata su Qt5
+- **QGIS 3.28 e successivi**: Plugin funzionante con interfaccia basata su Qt6
 
 ## Licenza
 Questo plugin è rilasciato sotto licenza GPL v3.0.
