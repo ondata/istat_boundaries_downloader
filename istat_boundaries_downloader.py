@@ -132,6 +132,41 @@ def get_frame_shadow(shadow_type="sunken"):
         else:
             return QFrame.Plain
 
+def get_cursor(cursor_type):
+    """
+    Restituisce il valore corretto del cursore, gestendo la differenza tra Qt5 e Qt6
+    
+    Args:
+        cursor_type (str): Tipo di cursore ('wait', 'arrow', 'ibeam', ecc.)
+    
+    Returns:
+        Il valore del cursore appropriato per la versione Qt in uso
+    """
+    if USE_QT6:
+        # Qt6
+        if cursor_type == 'wait':
+            return Qt.CursorShape.WaitCursor
+        elif cursor_type == 'arrow':
+            return Qt.CursorShape.ArrowCursor
+        elif cursor_type == 'ibeam':
+            return Qt.CursorShape.IBeamCursor
+        # Aggiungi altri tipi di cursore se necessario
+    else:
+        # Qt5
+        if cursor_type == 'wait':
+            return Qt.WaitCursor
+        elif cursor_type == 'arrow':
+            return Qt.ArrowCursor
+        elif cursor_type == 'ibeam':
+            return Qt.IBeamCursor
+        # Aggiungi altri tipi di cursore se necessario
+    
+    # Default: cursore a freccia
+    if USE_QT6:
+        return Qt.CursorShape.ArrowCursor
+    else:
+        return Qt.ArrowCursor
+
 # Per aprire URL esterni
 def open_web_url(self, url):
     """Apre un URL nel browser predefinito"""
