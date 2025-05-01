@@ -190,7 +190,10 @@ class IstatBoundariesDownloader:
         # Create and show the dialog
         dlg = DownloaderDialog(self.boundary_types, self.formats, self.base_url, self.iface, self.plugin_dir)
         # Show the dialog
-        dlg.exec_()
+        if USE_QT6:
+            dlg.exec()  # Qt6
+        else:
+            dlg.exec_()  # Qt5
 
 
 class DownloaderDialog(QDialog):
