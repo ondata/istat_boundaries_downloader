@@ -63,7 +63,9 @@ class IstatBoundariesDownloader:
         self.formats = {
             "Shapefile (.zip)": "zip",
             "GeoPackage (.gpkg)": "gpkg",
-            "CSV (.csv)": "csv"
+            "CSV (.csv)": "csv",
+            "KML (.kml)": "kml",
+            "KMZ (.kmz)": "kmz"
         }
 
     def initGui(self):
@@ -233,6 +235,12 @@ class DownloaderDialog(QDialog):
         self.csv_note.setStyleSheet("color: #FF5722; font-style: italic;")
         self.csv_note.setVisible(False)
         form_grid.addWidget(self.csv_note, 5, 1)
+
+        # Nota KML/KMZ (riga 6)
+        self.kml_note = QLabel("Nota: i formati KML/KMZ sono visualizzabili in Google Earth e altri visualizzatori GIS.")
+        self.kml_note.setStyleSheet("color: #2196F3; font-style: italic;")
+        self.kml_note.setVisible(False)
+        form_grid.addWidget(self.kml_note, 6, 1)
         
         # Imposta la larghezza delle colonne
         form_grid.setColumnStretch(0, 0)  # Prima colonna (labels) non si espande
@@ -618,11 +626,44 @@ class DownloaderDialog(QDialog):
                     qgis_file_path = uri
                 else:
                     qgis_file_path = dest_csv_path
+            elif file_format == "kml":
+                # Per KML, copialo direttamente
+                dest_kml_path = os.path.join(self.download_path, f"{file_name}.kml")
+                shutil.copyfile(temp_file_path, dest_kml_path)
+                qgis_file_path = dest_kml_path
+            elif file_format == "kmz":
+                # Per KMZ, copialo direttamente
+                dest_kmz_path = os.path.join(self.download_path, f"{file_name}.kmz")
+                shutil.copyfile(temp_file_path, dest_kmz_path)
+                
+                # Per visualizzazione in QGIS, estrai il contenuto KML
+                if not save_only:
+                    try:
+                        with zipfile.ZipFile(temp_file_path, 'r') as kmz:
+                            # Estrai il file KML dal KMZ (di solito è doc.kml)
+                            kml_file = None
+                            for file in kmz.namelist():
+                                if file.endswith('.kml'):
+                                    kml_file = file
+                                    break
+                            
+                            if kml_file:
+                                kmz.extract(kml_file, temp_dir)
+                                qgis_file_path = os.path.join(temp_dir, kml_file)
+                            else:
+                                # Se non troviamo un file KML, usa il KMZ direttamente
+                                qgis_file_path = dest_kmz_path
+                    except zipfile.BadZipFile:
+                        QApplication.restoreOverrideCursor()
+                        QMessageBox.critical(self, "Error", "Il file KMZ scaricato non è valido.")
+                        return
+                else:
+                    qgis_file_path = dest_kmz_path
             else:
-                # Per GeoPackage (.gpkg), copialo direttamente
-                dest_gpkg_path = os.path.join(self.download_path, f"{file_name}.gpkg")
-                shutil.copyfile(temp_file_path, dest_gpkg_path)
-                qgis_file_path = dest_gpkg_path
+                # Per GeoPackage (.gpkg) e altri formati, copialo direttamente
+                dest_path = os.path.join(self.download_path, f"{file_name}.{file_format}")
+                shutil.copyfile(temp_file_path, dest_path)
+                qgis_file_path = dest_path
             
             self.progress_bar.setValue(80)
             
@@ -633,6 +674,9 @@ class DownloaderDialog(QDialog):
                 if file_format == "csv":
                     # Per i CSV, utilizziamo un gestore specifico per dati non geografici
                     vector_layer = QgsVectorLayer(uri, layer_name, "delimitedtext")
+                elif file_format in ["kml", "kmz"]:
+                    # Per KML e KMZ, utilizziamo OGR
+                    vector_layer = QgsVectorLayer(qgis_file_path, layer_name, "ogr")
                 else:
                     # Per shapefile e geopackage, utilizziamo ogr
                     if file_format == "zip":
@@ -705,6 +749,7 @@ class DownloaderDialog(QDialog):
         """Mostra/nascondi note sui formati quando cambiano le selezioni"""
         format_text = self.format_combo.currentText()
         self.csv_note.setVisible("CSV" in format_text)
+        self.kml_note.setVisible("KML" in format_text or "KMZ" in format_text)
             
     def update_region_filter_visibility(self):
         """Mostra/nascondi il filtro regione o provincia in base al tipo di confine selezionato"""

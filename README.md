@@ -5,20 +5,22 @@ Un plugin QGIS per scaricare i confini amministrativi italiani forniti dall'ISTA
 
 ## Caratteristiche principali
 
-- **Download di confini amministrativi italiani** in diversi formati (Shapefile, GeoPackage, CSV)
+- **Download di confini amministrativi italiani** in diversi formati (Shapefile, GeoPackage, CSV, KML, KMZ)
 - **Selezione della data di riferimento** da un catalogo che va dal 1991 al 2024
 - **Diverse tipologie di confini**:
   - Regioni
   - Province (Unità Territoriali Sovracomunali)
   - Comuni
   - Ripartizioni geografiche
-- **Funzionalità di filtro**:
+- **Funzionalità di filtro avanzate**:
   - Filtro per regione (con possibilità di scaricare province o comuni della regione selezionata)
-  - Filtro per provincia (con possibilità di scaricare comuni della provincia selezionata)
+  - Filtro per provincia con campo di ricerca (con possibilità di scaricare comuni della provincia selezionata)
 - **Caricamento automatico** dei dati scaricati in QGIS
 - **Interfaccia semplice e intuitiva** con anteprima dell'URL di download
+- **Copia URL negli appunti** per uso esterno
+- **Barra di progresso** durante il download
 
-![Logo Plugin](./imgs/gui.png)
+![Logo Plugin](./imgs/gui_2.png)
 
 ## Installazione
 
@@ -40,7 +42,9 @@ Il plugin presenta un'interfaccia divisa in sezioni:
 - **Data di riferimento**: scegli la data per i confini (formato AAAAMMGG)
 - **Tipo di confine**: seleziona il tipo di entità amministrativa da scaricare
 - **Filtri**: quando applicabile, puoi filtrare per regione o provincia
-- **Formato**: scegli tra Shapefile (.zip), GeoPackage (.gpkg) o CSV (.csv)
+- **Formato**: scegli tra Shapefile (.zip), GeoPackage (.gpkg), CSV (.csv), KML (.kml) o KMZ (.kmz)
+  - Nota: I formati CSV contengono solo dati tabellari, senza geometrie
+  - Nota: I formati KML/KMZ sono visualizzabili in Google Earth e altri visualizzatori GIS
 
 #### Opzioni di salvataggio
 - **Cartella di destinazione**: dove salvare i file scaricati
@@ -68,7 +72,12 @@ Quando selezioni "Regioni" come tipo di confine, puoi attivare il filtro per vis
 #### Filtro per provincia
 Quando selezioni "Province" come tipo di confine, puoi:
 - Cercare una provincia specifica tramite il campo di ricerca
+- Visualizzare un elenco ordinato di province con codice
 - Scaricare solo i comuni appartenenti alla provincia selezionata
+
+#### Estrazione automatica
+- I file ZIP scaricati vengono automaticamente estratti nella cartella di destinazione
+- Il plugin crea sottocartelle organizzate per tipo di confine e data
 
 ## Requisiti di sistema
 - QGIS 3.20 o successivo
