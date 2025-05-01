@@ -428,7 +428,7 @@ class DownloaderDialog(QDialog):
         
         # Etichetta per feedback sulla copia
         self.copy_feedback = QLabel()
-        self.copy_feedback.setAlignment(Qt.AlignRight)
+        self.copy_feedback.setAlignment(get_alignment(right=True))
         self.copy_feedback.setStyleSheet("color: #4CAF50; font-style: italic; font-size: 11px;")
         self.copy_feedback.setVisible(False)
         url_layout.addWidget(self.copy_feedback)
