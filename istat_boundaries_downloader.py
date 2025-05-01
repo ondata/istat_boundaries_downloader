@@ -592,7 +592,8 @@ class DownloaderDialog(QDialog):
 
     def check_availability(self):
         """Check if the selected resource is available"""
-        QApplication.setOverrideCursor(QCursor(Qt.WaitCursor))
+        # Usa la funzione helper invece di Qt.WaitCursor direttamente
+        QApplication.setOverrideCursor(QCursor(get_cursor('wait')))
         
         date_str = self.date_combo.currentText()
         boundary_type = self.boundary_types[self.type_combo.currentText()]
@@ -629,7 +630,7 @@ class DownloaderDialog(QDialog):
         """Download and load the selected boundaries"""
         try:
             # Change cursor to wait cursor
-            QApplication.setOverrideCursor(QCursor(Qt.WaitCursor))
+            QApplication.setOverrideCursor(QCursor(get_cursor('wait')))
             
             # Show progress
             self.progress_bar.setVisible(True)
