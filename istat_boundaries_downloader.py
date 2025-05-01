@@ -93,6 +93,45 @@ def get_layout_direction(rtl=False):
     else:
         return Qt.RightToLeft if rtl else Qt.LeftToRight
 
+# Aggiungi queste funzioni helper per gestire le costanti di QFrame
+def get_frame_shape(line_type="hline"):
+    """Restituisce la costante appropriata per QFrame.setFrameShape"""
+    if USE_QT6:
+        # Qt6
+        if line_type.lower() == "hline":
+            return QFrame.Shape.HLine
+        elif line_type.lower() == "vline":
+            return QFrame.Shape.VLine
+        else:
+            return QFrame.Shape.NoFrame
+    else:
+        # Qt5
+        if line_type.lower() == "hline":
+            return QFrame.HLine
+        elif line_type.lower() == "vline":
+            return QFrame.VLine
+        else:
+            return QFrame.NoFrame
+
+def get_frame_shadow(shadow_type="sunken"):
+    """Restituisce la costante appropriata per QFrame.setFrameShadow"""
+    if USE_QT6:
+        # Qt6
+        if shadow_type.lower() == "sunken":
+            return QFrame.Shadow.Sunken
+        elif shadow_type.lower() == "raised":
+            return QFrame.Shadow.Raised
+        else:
+            return QFrame.Shadow.Plain
+    else:
+        # Qt5
+        if shadow_type.lower() == "sunken":
+            return QFrame.Sunken
+        elif shadow_type.lower() == "raised":
+            return QFrame.Raised
+        else:
+            return QFrame.Plain
+
 # Per aprire URL esterni
 def open_web_url(self, url):
     """Apre un URL nel browser predefinito"""
@@ -184,8 +223,8 @@ class DownloaderDialog(QDialog):
         
         # Aggiunge un separatore dopo l'intestazione
         separator = QFrame()
-        separator.setFrameShape(QFrame.HLine)
-        separator.setFrameShadow(QFrame.Sunken)
+        separator.setFrameShape(get_frame_shape("hline"))
+        separator.setFrameShadow(get_frame_shadow("sunken"))
         separator.setStyleSheet("background-color: #E0E0E0; max-height: 1px;")
         layout.addWidget(separator)
         layout.addSpacing(5)  # Aggiunge un po' di spazio extra dopo il separatore
