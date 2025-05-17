@@ -7,7 +7,7 @@ name=ISTAT Boundaries Downloader
 qgisMinimumVersion=3.20
 description=Download Italian administrative boundaries (ISTAT) from onData API
 version=0.1
-author=Salvatore Fiandaca, Giulio Fattori
+author=Salvatore Fiandaca
 email=pigrecoinfinito@gmail.com
 
 about=This plugin allows downloading Italian administrative boundaries (ISTAT) through the onData API. It enables users to access, download and work with official Italian administrative boundary data directly within QGIS.
