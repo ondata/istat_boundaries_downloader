@@ -421,7 +421,7 @@ class DownloaderDialog(QDialog):
         # Descrizione con collegamento ipertestuale
         description_layout = QHBoxLayout()
         description_layout.setContentsMargins(0, 5, 0, 0)
-        info_text = QLabel("Scarica confini amministrativi italiani usando le <a href='https://www.confini-amministrativi.it/'>API onData</a> (basate su dati <a href='https://www.istat.it/it/archivio/222527'>ISTAT</a>)")
+        info_text = QLabel("Scarica confini amministrativi italiani<br>usando le <a href='https://www.confini-amministrativi.it/'>API onData</a> (basate su dati <a href='https://www.istat.it/it/archivio/222527'>ISTAT</a>)")
         info_text.setOpenExternalLinks(True)
         info_text.setStyleSheet("font-size: 13px;")
 
