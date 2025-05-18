@@ -23,7 +23,7 @@ hasProcessingProvider=no
 changelog= v 0.1 Pubblicazione plugin
 
 # Tags are comma separated with spaces allowed
-tags=catasto, particelle, fogli, regione, italia, qt6
+tags=catasto, particelle, fogli, regione, italia
 
 homepage=https://github.com/ondata/confini-amministrativi-istat_qgis_plugin/blob/main/README.md
 category=Plugins
