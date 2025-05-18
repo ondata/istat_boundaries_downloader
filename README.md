@@ -22,7 +22,7 @@ Un plugin QGIS per scaricare i confini amministrativi italiani forniti dall'ISTA
 - **Copia URL negli appunti** per uso esterno
 - **Barra di progresso** durante il download
 
-![Logo Plugin](./imgs/gui_3.png)
+![Logo Plugin](./imgs/gui.png)
 
 ## Installazione
 
