@@ -426,7 +426,6 @@ class DownloaderDialog(QDialog):
         info_text.setStyleSheet("font-size: 13px;")
 
         description_layout.addWidget(info_text)
-        description_layout.addWidget(link_label)
         description_layout.addStretch(1)
 
         text_layout.addWidget(title_label)
