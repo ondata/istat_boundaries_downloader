@@ -70,7 +70,7 @@ class IstatBoundariesDownloader:
 
     def initGui(self):
         """Create the menu entries and toolbar icons inside the QGIS GUI"""
-        icon_path = os.path.join(self.plugin_dir, "icon.png")
+        icon_path = os.path.join(self.plugin_dir, "icon.svg")
         self.action = QAction(
             QIcon(icon_path),
             "ISTAT Boundaries Downloader",
@@ -408,7 +408,7 @@ class DownloaderDialog(QDialog):
 
         # Logo
         icon_label = QLabel()
-        icon_pixmap = QIcon(os.path.join(self.plugin_dir, "icon.png")).pixmap(88, 88)
+        icon_pixmap = QIcon(os.path.join(self.plugin_dir, "icon.svg")).pixmap(88, 88)
         icon_label.setPixmap(icon_pixmap)
 
         # Titolo e descrizione
