@@ -20,8 +20,9 @@ repository=https://github.com/ondata/istat_boundaries_downloader/blob/main/READM
 
 hasProcessingProvider=no
 # Uncomment the following line and add your changelog:
-changelog= v 0.1 Pubblicazione plugin
-changelog= v 0.2 Aggiornamento icona
+changelog= 
+    0.1 Pubblicazione plugin
+    0.2 Aggiornamento icona
 
 # Tags are comma separated with spaces allowed
 tags=catasto, particelle, fogli, regione, italia
