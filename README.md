@@ -96,3 +96,7 @@ Questo plugin è rilasciato sotto licenza GPL v3.0.
 
 ## Segnalazione problemi
 Per segnalare bug o richiedere nuove funzionalità, visita la [pagina delle issues](https://github.com/ondata/confini-amministrativi-istat_qgis_plugin/issues) su GitHub.
+
+## Video demo
+
+<https://youtu.be/_tzYuRNg2Fs>
