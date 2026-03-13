@@ -206,7 +206,7 @@ class DownloaderDialog(QDialog):
         save_path_label = QLabel("Salva in:")
         save_path_label.setAlignment(Qt.AlignmentFlag.AlignRight | Qt.AlignmentFlag.AlignVCenter)
         self.save_path_edit = QLabel("Seleziona una cartella di destinazione...")
-        self.save_path_edit.setStyleSheet("font-family: monospace; padding: 8px; background-color: #f8f8f8; border: 1px solid #ddd; border-radius: 4px;")
+        self.save_path_edit.setStyleSheet("font-family: monospace; padding: 8px; background-color: #f8f8f8; color: #333333; border: 1px solid #ddd; border-radius: 4px;")
         self.save_path_edit.setWordWrap(True)
 
         self.browse_button = QPushButton("Sfoglia")
@@ -238,7 +238,7 @@ class DownloaderDialog(QDialog):
         url_row_layout = QHBoxLayout()
 
         self.url_preview = QLabel()
-        self.url_preview.setStyleSheet("font-family: monospace; padding: 8px; background-color: #f8f8f8; border: 1px solid #ddd; border-radius: 4px;")
+        self.url_preview.setStyleSheet("font-family: monospace; padding: 8px; background-color: #f8f8f8; color: #333333; border: 1px solid #ddd; border-radius: 4px;")
         self.url_preview.setWordWrap(True)
         url_row_layout.addWidget(self.url_preview)
 
