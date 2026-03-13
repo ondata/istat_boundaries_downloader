@@ -21,6 +21,8 @@ Un plugin QGIS per scaricare i confini amministrativi italiani forniti dall'ISTA
 - **Interfaccia semplice e intuitiva** con anteprima dell'URL di download
 - **Copia URL negli appunti** per uso esterno
 - **Barra di progresso** durante il download
+- **Guida integrata** accessibile dal pulsante "Guida" nel dialogo principale
+- **Compatibilità tema scuro QGIS**
 
 ![Logo Plugin](./imgs/gui.png)
 
@@ -98,6 +100,7 @@ Questo plugin è rilasciato sotto licenza GPL v3.0.
 
 | Versione | Note |
 |---|---|
+| 0.4 | Aggiunta guida integrata (pulsante Guida con dialogo HTML); fix temi scuri QGIS |
 | 0.3 | Porting a QGIS 4 (compatibilità Qt6/PyQt6); separazione plugin e GUI in file distinti |
 | 0.2 | Aggiornamento icona |
 | 0.1 | Pubblicazione plugin |
