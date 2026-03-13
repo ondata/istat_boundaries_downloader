@@ -37,6 +37,8 @@ from qgis.PyQt.QtWidgets import (QDialog, QVBoxLayout, QHBoxLayout,
 from qgis.PyQt.QtGui import QIcon, QCursor, QDesktopServices
 from qgis.core import QgsProject, QgsVectorLayer, Qgis, QgsMessageLog
 
+from .istat_boundaries_downloader_help import HelpDialog
+
 
 class DownloaderDialog(QDialog):
     def __init__(self, boundary_types, formats, base_url, iface, plugin_dir, parent=None):
@@ -291,6 +293,13 @@ class DownloaderDialog(QDialog):
         self.close_button.setStyleSheet("padding: 8px 15px;")
         self.close_button.clicked.connect(self.reject)
         buttons_layout.addWidget(self.close_button)
+
+        # Pulsante Guida
+        self.help_button = QPushButton("Guida")
+        self.help_button.setIcon(QIcon(":/images/themes/default/mActionHelpContents.svg"))
+        self.help_button.setStyleSheet("padding: 8px 15px;")
+        self.help_button.clicked.connect(self.show_help)
+        buttons_layout.addWidget(self.help_button)
 
         # Aggiunge spaziatore
         buttons_layout.addStretch(1)
@@ -630,6 +639,11 @@ class DownloaderDialog(QDialog):
 
             self.progress_bar.setVisible(False)
             QApplication.restoreOverrideCursor()
+
+    def show_help(self):
+        """Apre il dialogo di guida"""
+        dlg = HelpDialog(self)
+        dlg.exec()
 
     def browse_folder(self):
         """Browse for a folder to save the downloaded files"""
