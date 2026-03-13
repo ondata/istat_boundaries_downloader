@@ -21,6 +21,8 @@ Un plugin QGIS per scaricare i confini amministrativi italiani forniti dall'ISTA
 - **Interfaccia semplice e intuitiva** con anteprima dell'URL di download
 - **Copia URL negli appunti** per uso esterno
 - **Barra di progresso** durante il download
+- **Guida integrata** accessibile dal pulsante "Guida" nel dialogo principale
+- **Compatibilità tema scuro QGIS**
 
 ![Logo Plugin](./imgs/gui.png)
 
@@ -82,7 +84,7 @@ Quando selezioni "Province" come tipo di confine, puoi:
 - Il plugin crea sottocartelle organizzate per tipo di confine e data
 
 ## Requisiti di sistema
-- QGIS 3.20 o successivo
+- QGIS 3.20 o successivo (compatibile anche con QGIS 4.x)
 - Connessione Internet per l'accesso alle API
 
 ## Licenza
@@ -93,6 +95,15 @@ Questo plugin è rilasciato sotto licenza GPL v3.0.
 - **Email**: pigrecoinfinito@gmail.com
 - **Dati**: forniti dalle API di [confini-amministrativi.it](https://www.confini-amministrativi.it/)
 - **Repository**: [GitHub](https://github.com/ondata/confini-amministrativi-istat_qgis_plugin)
+
+## Changelog
+
+| Versione | Note |
+|---|---|
+| 0.4 | Aggiunta guida integrata (pulsante Guida con dialogo HTML); fix temi scuri QGIS |
+| 0.3 | Porting a QGIS 4 (compatibilità Qt6/PyQt6); separazione plugin e GUI in file distinti |
+| 0.2 | Aggiornamento icona |
+| 0.1 | Pubblicazione plugin |
 
 ## Segnalazione problemi
 Per segnalare bug o richiedere nuove funzionalità, visita la [pagina delle issues](https://github.com/ondata/confini-amministrativi-istat_qgis_plugin/issues) su GitHub.
