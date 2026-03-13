@@ -5,6 +5,7 @@
 [general]
 name=istat_boundaries_downloader
 qgisMinimumVersion=3.20
+qgisMaximumVersion=4.99
 description=Download Italian administrative boundaries (ISTAT) from onData API
 version=0.2
 author=Salvatore Fiandaca

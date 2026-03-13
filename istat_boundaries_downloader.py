@@ -89,7 +89,7 @@ class IstatBoundariesDownloader:
         # Create and show the dialog
         dlg = DownloaderDialog(self.boundary_types, self.formats, self.base_url, self.iface, self.plugin_dir)
         # Show the dialog
-        dlg.exec_()
+        dlg.exec()
 
 
 class DownloaderDialog(QDialog):
@@ -122,8 +122,8 @@ class DownloaderDialog(QDialog):
 
         # Aggiunge un separatore dopo l'intestazione
         separator = QFrame()
-        separator.setFrameShape(QFrame.HLine)
-        separator.setFrameShadow(QFrame.Sunken)
+        separator.setFrameShape(QFrame.Shape.HLine)
+        separator.setFrameShadow(QFrame.Shadow.Sunken)
         separator.setStyleSheet("background-color: #E0E0E0; max-height: 1px;")
         layout.addWidget(separator)
         layout.addSpacing(5)  # Aggiunge un po' di spazio extra dopo il separatore
@@ -138,7 +138,7 @@ class DownloaderDialog(QDialog):
 
         # 1. Selezione data (riga 0)
         date_label = QLabel("Data di riferimento (>=1991):")
-        date_label.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
+        date_label.setAlignment(Qt.AlignmentFlag.AlignRight | Qt.AlignmentFlag.AlignVCenter)
         self.date_combo = QComboBox()
 
         # Aggiunge date in gruppi logici
@@ -166,7 +166,7 @@ class DownloaderDialog(QDialog):
 
         # 2. Selezione tipo di confine (riga 1)
         type_label = QLabel("Tipo di confine amministrativo:")
-        type_label.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
+        type_label.setAlignment(Qt.AlignmentFlag.AlignRight | Qt.AlignmentFlag.AlignVCenter)
         self.type_combo = QComboBox()
         tipi_confine_ordinati = [
             "Ripartizioni Geografiche",
@@ -192,12 +192,12 @@ class DownloaderDialog(QDialog):
         # Checkbox per attivare filtro per singola regione (riga 0)
         self.region_filter_check = QCheckBox("Filtra per singola regione")
         self.region_filter_check.setChecked(False)  # Default: NON selezionato (scarica tutta Italia)
-        self.region_filter_check.setLayoutDirection(Qt.RightToLeft)  # Allinea a destra
-        region_grid.addWidget(self.region_filter_check, 0, 1, 1, 1, Qt.AlignLeft)  # Allineato a sinistra
+        self.region_filter_check.setLayoutDirection(Qt.LayoutDirection.RightToLeft)  # Allinea a destra
+        region_grid.addWidget(self.region_filter_check, 0, 1, 1, 1, Qt.AlignmentFlag.AlignLeft)  # Allineato a sinistra
 
         # Selezione regione (riga 1)
         region_label = QLabel("Filtro regione:")
-        region_label.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
+        region_label.setAlignment(Qt.AlignmentFlag.AlignRight | Qt.AlignmentFlag.AlignVCenter)
         self.region_combo = QComboBox()
         self.region_combo.setMinimumWidth(300)
         region_grid.addWidget(region_label, 1, 0)
@@ -205,7 +205,7 @@ class DownloaderDialog(QDialog):
 
         # Selezione tipo dati regione (riga 2)
         region_data_label = QLabel("Scarica:")
-        region_data_label.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
+        region_data_label.setAlignment(Qt.AlignmentFlag.AlignRight | Qt.AlignmentFlag.AlignVCenter)
         self.region_data_combo = QComboBox()
         self.region_data_combo.setMinimumWidth(300)
         self.region_data_combo.addItem("Province della regione")
@@ -222,7 +222,7 @@ class DownloaderDialog(QDialog):
 
         # 4. Selezione formato (riga 4)
         format_label = QLabel("Formato disponibile:")
-        format_label.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
+        format_label.setAlignment(Qt.AlignmentFlag.AlignRight | Qt.AlignmentFlag.AlignVCenter)
         self.format_combo = QComboBox()
         for label in self.formats.keys():
             self.format_combo.addItem(label)
@@ -263,7 +263,7 @@ class DownloaderDialog(QDialog):
 
         # Selezione percorso di salvataggio
         save_path_label = QLabel("Salva in:")
-        save_path_label.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
+        save_path_label.setAlignment(Qt.AlignmentFlag.AlignRight | Qt.AlignmentFlag.AlignVCenter)
         self.save_path_edit = QLabel("Seleziona una cartella di destinazione...")
         self.save_path_edit.setStyleSheet("font-family: monospace; padding: 8px; background-color: #f8f8f8; border: 1px solid #ddd; border-radius: 4px;")
         self.save_path_edit.setWordWrap(True)
@@ -327,7 +327,7 @@ class DownloaderDialog(QDialog):
 
         # Etichetta per feedback sulla copia
         self.copy_feedback = QLabel()
-        self.copy_feedback.setAlignment(Qt.AlignRight)
+        self.copy_feedback.setAlignment(Qt.AlignmentFlag.AlignRight)
         self.copy_feedback.setStyleSheet("color: #4CAF50; font-style: italic; font-size: 11px;")
         self.copy_feedback.setVisible(False)
         url_layout.addWidget(self.copy_feedback)
@@ -439,7 +439,7 @@ class DownloaderDialog(QDialog):
 
     def check_availability(self):
         """Check if the selected resource is available"""
-        QApplication.setOverrideCursor(QCursor(Qt.WaitCursor))
+        QApplication.setOverrideCursor(QCursor(Qt.CursorShape.WaitCursor))
 
         date_str = self.date_combo.currentText()
         boundary_type = self.boundary_types[self.type_combo.currentText()]
@@ -466,17 +466,17 @@ class DownloaderDialog(QDialog):
             urllib.request.urlopen(request)
             return True
         except urllib.error.HTTPError as e:
-            QgsMessageLog.logMessage(f"URL check failed: {url} - {str(e)}", "ISTAT Downloader", Qgis.Critical)
+            QgsMessageLog.logMessage(f"URL check failed: {url} - {str(e)}", "ISTAT Downloader", Qgis.MessageLevel.Critical)
             return False
         except Exception as e:
-            QgsMessageLog.logMessage(f"URL check error: {str(e)}", "ISTAT Downloader", Qgis.Critical)
+            QgsMessageLog.logMessage(f"URL check error: {str(e)}", "ISTAT Downloader", Qgis.MessageLevel.Critical)
             return False
 
     def download_boundaries(self):
         """Download and load the selected boundaries"""
         try:
             # Change cursor to wait cursor
-            QApplication.setOverrideCursor(QCursor(Qt.WaitCursor))
+            QApplication.setOverrideCursor(QCursor(Qt.CursorShape.WaitCursor))
 
             # Show progress
             self.progress_bar.setVisible(True)
@@ -703,7 +703,7 @@ class DownloaderDialog(QDialog):
                 if vector_layer.isValid():
                     # Add the layer to the map
                     QgsProject.instance().addMapLayer(vector_layer)
-                    QgsMessageLog.logMessage(f"Dati caricati con successo: {layer_name}", "ISTAT Downloader", Qgis.Info)
+                    QgsMessageLog.logMessage(f"Dati caricati con successo: {layer_name}", "ISTAT Downloader", Qgis.MessageLevel.Info)
                 else:
                     QMessageBox.critical(self, "Error", f"Il file {file_format} scaricato non è valido.")
                     self.progress_bar.setVisible(False)
@@ -721,7 +721,7 @@ class DownloaderDialog(QDialog):
             QMessageBox.information(self, "Operazione completata", message)
 
         except Exception as e:
-            QgsMessageLog.logMessage(f"Errore: {str(e)}", "ISTAT Downloader", Qgis.Critical)
+            QgsMessageLog.logMessage(f"Errore: {str(e)}", "ISTAT Downloader", Qgis.MessageLevel.Critical)
             QMessageBox.critical(self, "Error", f"Si è verificato un errore: {str(e)}")
 
         finally:
@@ -866,7 +866,7 @@ class DownloaderDialog(QDialog):
             self.update_region_filter_state(self.region_filter_check.isChecked())
 
         except Exception as e:
-            QgsMessageLog.logMessage(f"Errore nel caricare le regioni: {str(e)}", "ISTAT Downloader", Qgis.Critical)
+            QgsMessageLog.logMessage(f"Errore nel caricare le regioni: {str(e)}", "ISTAT Downloader", Qgis.MessageLevel.Critical)
             self.region_combo.clear()
             self.region_combo.addItem("Errore nel caricare le regioni")
 
@@ -938,7 +938,7 @@ class DownloaderDialog(QDialog):
 
         # Campo di ricerca provincia
         search_label = QLabel("Cerca provincia:")
-        search_label.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
+        search_label.setAlignment(Qt.AlignmentFlag.AlignRight | Qt.AlignmentFlag.AlignVCenter)
         search_label.setFixedWidth(200)
 
         # Nuova configurazione con dimensione esplicita
@@ -956,7 +956,7 @@ class DownloaderDialog(QDialog):
 
         # Selezione provincia
         province_label = QLabel("Filtro provincia:")
-        province_label.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
+        province_label.setAlignment(Qt.AlignmentFlag.AlignRight | Qt.AlignmentFlag.AlignVCenter)
         province_label.setFixedWidth(200)
 
         # MODIFICA: Configurazione provincia combo uniforme
@@ -1065,7 +1065,7 @@ class DownloaderDialog(QDialog):
 
             if not url_disponibile:
                 # Se l'URL non è disponibile, mostra un messaggio
-                QgsMessageLog.logMessage(f"URL province non disponibile: {provinces_url}", "ISTAT Downloader", Qgis.Warning)
+                QgsMessageLog.logMessage(f"URL province non disponibile: {provinces_url}", "ISTAT Downloader", Qgis.MessageLevel.Warning)
                 self.province_combo.clear()
                 self.province_combo.addItem("Dati non disponibili per questa data")
                 return
@@ -1152,12 +1152,12 @@ class DownloaderDialog(QDialog):
 
             except Exception as e:
                 # In caso di errore, mostra un messaggio
-                QgsMessageLog.logMessage(f"Errore nel processare CSV province: {str(e)}", "ISTAT Downloader", Qgis.Critical)
+                QgsMessageLog.logMessage(f"Errore nel processare CSV province: {str(e)}", "ISTAT Downloader", Qgis.MessageLevel.Critical)
                 self.province_combo.clear()
                 self.province_combo.addItem(f"Errore: {str(e)}")
 
         except Exception as e:
-            QgsMessageLog.logMessage(f"Errore generale nel caricare le province: {str(e)}", "ISTAT Downloader", Qgis.Critical)
+            QgsMessageLog.logMessage(f"Errore generale nel caricare le province: {str(e)}", "ISTAT Downloader", Qgis.MessageLevel.Critical)
             self.province_combo.clear()
             self.province_combo.addItem("Errore nel caricare le province")
 
