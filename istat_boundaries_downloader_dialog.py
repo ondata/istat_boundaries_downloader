@@ -459,13 +459,16 @@ class DownloaderDialog(QDialog):
                 self.province_filter_container.isVisible() and
                 self.province_combo.count() > 0 and
                 self.province_combo.currentText() != "Caricamento province..." and
-                self.province_combo.currentText() != "Errore nel caricare le province" and
-                self.province_comuni_check.isChecked()):
+                self.province_combo.currentText() != "Errore nel caricare le province"):
 
                 province_code = self.province_combo.currentData()
                 province_name = self.province_combo.currentText().split('-', 1)[1] if '-' in self.province_combo.currentText() else self.province_combo.currentText()
-                boundary_type = f"unita-territoriali-sovracomunali/{province_code}/comuni"
-                display_type = f"comuni della provincia di {province_name}"
+                if self.province_comuni_check.isChecked():
+                    boundary_type = f"unita-territoriali-sovracomunali/{province_code}/comuni"
+                    display_type = f"comuni della provincia di {province_name}"
+                else:
+                    boundary_type = f"unita-territoriali-sovracomunali/{province_code}"
+                    display_type = f"provincia di {province_name}"
             else:
                 display_type = boundary_type
 
@@ -784,11 +787,13 @@ class DownloaderDialog(QDialog):
                 self.province_filter_container.isVisible() and
                 self.province_combo.count() > 0 and
                 self.province_combo.currentText() != "Caricamento province..." and
-                self.province_combo.currentText() != "Errore nel caricare le province" and
-                self.province_comuni_check.isChecked()):
+                self.province_combo.currentText() != "Errore nel caricare le province"):
 
                 province_code = self.province_combo.currentData()
-                boundary_type = f"unita-territoriali-sovracomunali/{province_code}/comuni"
+                if self.province_comuni_check.isChecked():
+                    boundary_type = f"unita-territoriali-sovracomunali/{province_code}/comuni"
+                else:
+                    boundary_type = f"unita-territoriali-sovracomunali/{province_code}"
 
             url = f"{self.base_url}{date_str}/{boundary_type}.{file_format}"
             self.current_url = url
