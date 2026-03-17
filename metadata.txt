@@ -7,7 +7,7 @@ name=istat_boundaries_downloader
 qgisMinimumVersion=3.20
 qgisMaximumVersion=4.99
 description=Download Italian administrative boundaries (ISTAT) from onData API
-version=0.4
+version=0.5
 author=Salvatore Fiandaca
 email=pigrecoinfinito@gmail.com
 
@@ -22,6 +22,7 @@ repository=https://github.com/ondata/istat_boundaries_downloader/blob/main/READM
 hasProcessingProvider=no
 # Uncomment the following line and add your changelog:
 changelog=
+    0.5 Aggiornamento dati al 2026 (aggiunta data 20260101)
     0.4 Aggiunta guida integrata (pulsante Guida con dialogo HTML); fix temi scuri QGIS
     0.3 Porting a QGIS 4 (compatibilità Qt6/PyQt6); separazione plugin e GUI in file distinti
     0.2 Aggiornamento icona

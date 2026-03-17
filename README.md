@@ -8,7 +8,7 @@ Un plugin QGIS per scaricare i confini amministrativi italiani forniti dall'ISTA
 ## Caratteristiche principali
 
 - **Download di confini amministrativi italiani** in diversi formati (Shapefile, GeoPackage, CSV, KML, KMZ)
-- **Selezione della data di riferimento** da un catalogo che va dal 1991 al 2024
+- **Selezione della data di riferimento** da un catalogo che va dal 1991 al 2026
 - **Diverse tipologie di confini**:
   - Regioni
   - Province (Unità Territoriali Sovracomunali)
@@ -100,6 +100,7 @@ Questo plugin è rilasciato sotto licenza GPL v3.0.
 
 | Versione | Note |
 |---|---|
+| 0.5 | Aggiornamento dati al 2026 (aggiunta data 20260101) |
 | 0.4 | Aggiunta guida integrata (pulsante Guida con dialogo HTML); fix temi scuri QGIS |
 | 0.3 | Porting a QGIS 4 (compatibilità Qt6/PyQt6); separazione plugin e GUI in file distinti |
 | 0.2 | Aggiornamento icona |

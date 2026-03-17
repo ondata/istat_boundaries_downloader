@@ -48,7 +48,7 @@ HELP_HTML = """
 <h2>Campi del dialogo</h2>
 
 <h3>Data di riferimento</h3>
-<p>Seleziona l'anno di validità dei confini. Il catalogo copre dal <b>1991</b> al <b>2025</b>.
+<p>Seleziona l'anno di validità dei confini. Il catalogo copre dal <b>1991</b> al <b>2026</b>.
 Non tutte le combinazioni data/tipo sono disponibili: l'URL di anteprima viene aggiornato in tempo reale.</p>
 
 <h3>Tipo di confine amministrativo</h3>
