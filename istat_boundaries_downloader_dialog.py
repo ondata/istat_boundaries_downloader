@@ -458,8 +458,7 @@ class DownloaderDialog(QDialog):
                 hasattr(self, 'province_filter_container') and
                 self.province_filter_container.isVisible() and
                 self.province_combo.count() > 0 and
-                self.province_combo.currentText() != "Caricamento province..." and
-                self.province_combo.currentText() != "Errore nel caricare le province"):
+                self.province_combo.currentData() is not None):
 
                 province_code = self.province_combo.currentData()
                 province_name = self.province_combo.currentText().split('-', 1)[1] if '-' in self.province_combo.currentText() else self.province_combo.currentText()
@@ -786,8 +785,7 @@ class DownloaderDialog(QDialog):
                 hasattr(self, 'province_filter_container') and
                 self.province_filter_container.isVisible() and
                 self.province_combo.count() > 0 and
-                self.province_combo.currentText() != "Caricamento province..." and
-                self.province_combo.currentText() != "Errore nel caricare le province"):
+                self.province_combo.currentData() is not None):
 
                 province_code = self.province_combo.currentData()
                 if self.province_comuni_check.isChecked():
@@ -929,6 +927,8 @@ class DownloaderDialog(QDialog):
                         col_clean = col.strip('"')
                         if col_clean in ['cod_prov', 'cod_ut', 'cod_provincia']:
                             col_indices['cod_prov'] = i
+                        elif col_clean in ['cod_uts']:
+                            col_indices['cod_uts'] = i
                         elif col_clean in ['den_prov', 'den_uts', 'den_provincia']:
                             col_indices['den_prov'] = i
                         elif col_clean in ['den_pcm', 'den_ita']:
@@ -945,6 +945,9 @@ class DownloaderDialog(QDialog):
                             continue
 
                         cod_prov = parts[col_indices['cod_prov']].strip('"')
+                        # L'API usa cod_uts come chiave URL (diverso da cod_prov per le città metropolitane)
+                        uts_idx = col_indices.get('cod_uts', col_indices['cod_prov'])
+                        url_code = parts[uts_idx].strip('"') if len(parts) > uts_idx else cod_prov
                         nome_prov = None
 
                         if 'den_prov' in col_indices and len(parts) > col_indices['den_prov']:
@@ -966,7 +969,7 @@ class DownloaderDialog(QDialog):
                             nome_prov = f"Provincia {cod_prov}"
 
                         display_text = f"{cod_prov}-{nome_prov}"
-                        province_from_api.append((display_text, cod_prov))
+                        province_from_api.append((display_text, url_code))
 
                 if province_from_api:
                     self.province_combo.clear()
