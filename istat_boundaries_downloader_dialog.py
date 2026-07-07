@@ -22,6 +22,7 @@
 import os
 import urllib.request
 import urllib.error
+import urllib.parse
 import zipfile
 import tempfile
 import http.client
@@ -38,6 +39,18 @@ from qgis.PyQt.QtGui import QIcon, QCursor, QDesktopServices
 from qgis.core import QgsProject, QgsVectorLayer, Qgis, QgsMessageLog
 
 from .istat_boundaries_downloader_help import HelpDialog
+
+# Schemi URL ammessi per le richieste HTTP verso le API ISTAT.
+# Evita che un base_url manomesso o malformato possa far aprire
+# schemi come file:// tramite urllib (Bandit B310).
+ALLOWED_URL_SCHEMES = ('http', 'https')
+
+
+def assert_allowed_url_scheme(url):
+    """Verifica che l'URL usi solo schema http/https, altrimenti solleva ValueError."""
+    scheme = urllib.parse.urlparse(url).scheme
+    if scheme not in ALLOWED_URL_SCHEMES:
+        raise ValueError(f"Schema URL non consentito: '{scheme}'")
 
 
 class DownloaderDialog(QDialog):
@@ -408,8 +421,9 @@ class DownloaderDialog(QDialog):
     def check_url_exists(self, url):
         """Check if a URL exists without downloading the full content"""
         try:
+            assert_allowed_url_scheme(url)
             request = urllib.request.Request(url, method='HEAD')
-            urllib.request.urlopen(request)
+            urllib.request.urlopen(request)  # nosec B310 - schema validato sopra
             return True
         except urllib.error.HTTPError as e:
             QgsMessageLog.logMessage(f"URL check failed: {url} - {str(e)}", "ISTAT Downloader", Qgis.MessageLevel.Critical)
@@ -497,7 +511,8 @@ class DownloaderDialog(QDialog):
             temp_file_path = os.path.join(temp_dir, f"{safe_boundary_name}.{file_format}")
 
             try:
-                urllib.request.urlretrieve(url, temp_file_path)
+                assert_allowed_url_scheme(url)
+                urllib.request.urlretrieve(url, temp_file_path)  # nosec B310 - schema validato sopra
             except urllib.error.HTTPError as e:
                 if e.code == 404:
                     QApplication.restoreOverrideCursor()
@@ -727,7 +742,8 @@ class DownloaderDialog(QDialog):
             url_disponibile = self.check_url_exists(regions_url)
 
             if url_disponibile:
-                temp_file, _ = urllib.request.urlretrieve(regions_url)
+                assert_allowed_url_scheme(regions_url)
+                temp_file, _ = urllib.request.urlretrieve(regions_url)  # nosec B310 - schema validato sopra
                 available_regions = set()
 
                 with open(temp_file, 'r', encoding='utf-8') as f:
@@ -916,7 +932,8 @@ class DownloaderDialog(QDialog):
             province_from_api = []
 
             try:
-                temp_file, _ = urllib.request.urlretrieve(provinces_url)
+                assert_allowed_url_scheme(provinces_url)
+                temp_file, _ = urllib.request.urlretrieve(provinces_url)  # nosec B310 - schema validato sopra
 
                 with open(temp_file, 'r', encoding='utf-8') as f:
                     header_line = next(f)

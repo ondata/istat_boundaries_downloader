@@ -100,6 +100,7 @@ Questo plugin è rilasciato sotto licenza GPL v3.0.
 
 | Versione | Note |
 |---|---|
+| 0.5.1 | Fix avvisi sicurezza QGIS plugin repository: validazione schema URL (http/https) prima di ogni richiesta di rete |
 | 0.5 | Aggiornamento dati al 2026 (aggiunta data 20260101) |
 | 0.4 | Aggiunta guida integrata (pulsante Guida con dialogo HTML); fix temi scuri QGIS |
 | 0.3 | Porting a QGIS 4 (compatibilità Qt6/PyQt6); separazione plugin e GUI in file distinti |
