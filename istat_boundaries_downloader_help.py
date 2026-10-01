@@ -45,6 +45,12 @@ HELP_HTML = """
   <li>Clicca <b>Scarica</b></li>
 </ol>
 
+<h2>⚠️ Informazioni importanti sui dati</h2>
+<div class="note">
+  <strong>I dati scaricati sono GENERALIZZATI</strong> — le geometrie sono semplificate e non contengono tutti i dettagli dei confini originali ISTAT (isole minori, insenature, etc.).
+  Per geometrie complete e non generalizzate, scarica direttamente i dati da <a href="https://www.istat.it/it/archivio/222527">ISTAT</a>.
+</div>
+
 <h2>Campi del dialogo</h2>
 
 <h3>Data di riferimento</h3>
